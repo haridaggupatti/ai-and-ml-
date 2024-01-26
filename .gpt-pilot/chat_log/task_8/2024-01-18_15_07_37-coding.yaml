@@ -1,0 +1,55 @@
+endpoint: OPENAI
+model: gpt-4-1106-preview
+messages:
+- role: system
+  content: You are a full stack software developer who works in a software development agency. You write very modular and
+    clean code. Your job is to implement tasks that your tech lead assigns you. Each task has a description of what needs
+    to be implemented, a programmatic goal that will determine if a task can be marked as done and user-review goal that will
+    determine if a task is done or not but from a user perspective since it will be reviewed by a human.
+- role: user
+  content: "Here is how the file `controllers/tradeController.js` looks like right now:\n```\nconst MetaApiConnection = require('../utils/metaApiConnection');\n\
+    const RiskManagementService = require('../services/riskManagementService');\nconst RiskPredictionModel = require('../ai/riskPredictionModel');\n\
+    const logger = require('../utils/logger');\n\nclass TradeController {\n  constructor() {\n    const metaApiKey = process.env.META_API_KEY;\
+    \ // INPUT_REQUIRED {Store your MetaApi key here}\n    const accountId = process.env.META_API_ACCOUNT_ID; // INPUT_REQUIRED\
+    \ {Store your MetaApi account ID here}\n    this.metaApiConnection = new MetaApiConnection(metaApiKey, accountId);\n \
+    \   this.riskManagementService = new RiskManagementService(new RiskPredictionModel());\n  }\n\n  async executeTrade(marketData,\
+    \ tradeId) {\n    try {\n      const { stopLoss, takeProfit } = await this.riskManagementService.calculateRiskParameters(marketData);\n\
+    \      await this.metaApiConnection.applyRiskParameters(tradeId, stopLoss, takeProfit);\n      logger.info(`Trade executed\
+    \ with stopLoss: ${stopLoss}, takeProfit: ${takeProfit}`);\n      // Create trade order object\n      const tradeOrder\
+    \ = {\n        instrument: marketData.instrument,\n        units: marketData.units,\n        side: marketData.side,\n\
+    \        stopLoss: stopLoss,\n        takeProfit: takeProfit\n      };\n\n      // Send the order to MetaApi for execution\n\
+    \      const executionResponse = await this.metaApiConnection.executeTrade(tradeOrder);\n      return executionResponse;\n\
+    \    } catch (error) {\n      logger.error(`Trade execution failure: ${error.message}`);\n      throw error;\n    }\n\
+    \  }\n}\n\nmodule.exports = TradeController;\n\n```\n\nAnd here is the new implementation for the same file:\n```\n//\
+    \ [OLD CODE] Include all previous imports and initial class structure\n\nclass TradeController {\n  constructor() {\n\
+    \    // [OLD CODE] Keep the existing constructor initialization\n    // Replace with actual API endpoint\n    // INPUT_REQUIRED\
+    \ {Store the endpoint for external learning service}\n    const externalLearningEndpoint = 'https://external.api/learning-source';\n\
+    \n    this.riskManagementService = new RiskManagementService(\n      new RiskPredictionModel(),\n      externalLearningEndpoint\n\
+    \    );\n  }\n\n  // [OLD CODE] Keep the rest of the controller functionality\n\n}\n\nmodule.exports = TradeController;\n\
+    \n```\n\nNow, implement the new changes into the previously implemented file and return the entirely coded file. Do not\
+    \ add any lines of code that are not in the previously coded file or the new implementation but only combine those two.\n\
+    \n**IMPORTANT**\nAll lines of code in the new implementation should be present. From the old implementation, only take\
+    \ the ones that are replaced with the comment `[OLD CODE]` in the new implementation\n\n**IMPORTANT**\nMake sure that\
+    \ you respond with all lines of code that are replaced by these comments, including all control structures, error handling,\
+    \ and any other relevant logic that was in the original code.\nUnder no circumstances should you ever leave any part of\
+    \ the code snippet unwritten. Every single line of code that exists in the place where the comment lives right now should\
+    \ be replaced. Do not include any code that is above or below the comment but only the code that should be in the position\
+    \ of the comment."
+- role: user
+  content: "**IMPORTANT**\nYou must respond with ONLY the JSON object, with NO additional text or explanation.\n\nHere is\
+    \ the schema for the expected JSON object:\n```json\n{\n    \"file_content\": {\n        \"type\": \"string\",\n     \
+    \   \"description\": \"Fully coded file. This contains only the lines of code and no other text.\"\n    }\n}\n```\n\n"
+response: "```json\n{\n    \"file_content\": \"const MetaApiConnection = require('../utils/metaApiConnection');\\nconst RiskManagementService\
+  \ = require('../services/riskManagementService');\\nconst RiskPredictionModel = require('../ai/riskPredictionModel');\\\
+  nconst logger = require('../utils/logger');\\n\\nclass TradeController {\\n  constructor() {\\n    const metaApiKey = process.env.META_API_KEY;\\\
+  n    const accountId = process.env.META_API_ACCOUNT_ID;\\n    this.metaApiConnection = new MetaApiConnection(metaApiKey,\
+  \ accountId);\\n    const externalLearningEndpoint = 'https://external.api/learning-source';\\n\\n    this.riskManagementService\
+  \ = new RiskManagementService(\\n      new RiskPredictionModel(),\\n      externalLearningEndpoint\\n    );\\n  }\\n\\n\
+  \  async executeTrade(marketData, tradeId) {\\n    try {\\n      const { stopLoss, takeProfit } = await this.riskManagementService.calculateRiskParameters(marketData);\\\
+  n      await this.metaApiConnection.applyRiskParameters(tradeId, stopLoss, takeProfit);\\n      logger.info(`Trade executed\
+  \ with stopLoss: ${stopLoss}, takeProfit: ${takeProfit}`);\\n      // Create trade order object\\n      const tradeOrder\
+  \ = {\\n        instrument: marketData.instrument,\\n        units: marketData.units,\\n        side: marketData.side,\\\
+  n        stopLoss: stopLoss,\\n        takeProfit: takeProfit\\n      };\\n\\n      // Send the order to MetaApi for execution\\\
+  n      const executionResponse = await this.metaApiConnection.executeTrade(tradeOrder);\\n      return executionResponse;\\\
+  n    } catch (error) {\\n      logger.error(`Trade execution failure: ${error.message}`);\\n      throw error;\\n    }\\\
+  n  }\\n}\\n\\nmodule.exports = TradeController;\\n\"\n}\n```"

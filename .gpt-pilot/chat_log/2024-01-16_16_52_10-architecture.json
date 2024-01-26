@@ -1,0 +1,50 @@
+{
+  "endpoint": "OPENAI",
+  "model": "gpt-4-1106-preview",
+  "functions": [
+    {
+      "name": "process_technologies",
+      "description": "Print the list of technologies that are created.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "technologies": {
+            "type": "array",
+            "description": "List of technologies.",
+            "items": {
+              "type": "string",
+              "description": "technology"
+            }
+          }
+        },
+        "required": [
+          "technologies"
+        ]
+      }
+    }
+  ],
+  "response": {
+    "technologies": [
+      "Node.js",
+      "MongoDB",
+      "PeeWee",
+      "Bootstrap",
+      "HTML",
+      "CSS3",
+      "Socket.io",
+      "TensorFlow",
+      "Keras",
+      "scikit-learn",
+      "pandas",
+      "NumPy",
+      "matplotlib",
+      "D3.js",
+      "axios",
+      "JWT",
+      "bcrypt",
+      "MetaApi SDK",
+      "cheerio",
+      "express"
+    ]
+  }
+}

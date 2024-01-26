@@ -1,0 +1,57 @@
+{
+  "endpoint": "OPENAI",
+  "model": "gpt-4-1106-preview",
+  "functions": [
+    {
+      "name": "save_files",
+      "description": "Iterates over the files passed to this function and saves them on the disk.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "files": {
+            "type": "array",
+            "description": "List of files that need to be saved.",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "description": "Name of the file that needs to be saved on the disk."
+                },
+                "path": {
+                  "type": "string",
+                  "description": "Full path of the file with the file name that needs to be saved."
+                },
+                "content": {
+                  "type": "string",
+                  "description": "Full content of the file that needs to be saved on the disk. **IMPORTANT**When you want to add a comment that tells the user to add the previous implementation at that place, make sure that the comment starts with `[OLD CODE]` and add a description of what old code should be inserted here. For example, `[OLD CODE] Login route`."
+                },
+                "description": {
+                  "type": "string",
+                  "description": "Description of the file that needs to be saved on the disk. This description doesn't need to explain what is being done currently in this task but rather what is the idea behind this file - what do we want to put in this file in the future. Write the description ONLY if this is the first time this file is being saved. If this file already exists on the disk, leave this field empty."
+                }
+              },
+              "required": [
+                "name",
+                "path",
+                "content"
+              ]
+            }
+          }
+        },
+        "required": [
+          "files"
+        ]
+      }
+    }
+  ],
+  "response": {
+    "files": [
+      {
+        "name": "authRoutes.js",
+        "path": "/routes/authRoutes.js",
+        "content": "const express = require('express');\nconst User = require('../models/User');\nconst bcrypt = require('bcryptjs');\nconst { generateToken } = require('../utils/jwtUtils');\n\nconst router = express.Router();\n\nrouter.post('/register', async (req, res) => {\n  try {\n    const { username, password } = req.body;\n    let user = await User.findOne({ username });\n    if (user) {\n      return res.status(400).json({ message: 'User already exists' });\n    }\n    user = new User({ username, password });\n    await user.save();\n    const token = generateToken(user);\n    res.status(201).json({ token });\n  } catch (error) {\n    res.status(500).json({ message: 'Error registering new user' });\n  }\n});\n\nrouter.post('/login', async (req, res) => {\n  try {\n    const { username, password } = req.body;\n    const user = await User.findOne({ username });\n    if (!user) {\n      return res.status(401).json({ message: 'Authentication failed. User not found.' });\n    }\n    user.comparePassword(password, (err, isMatch) => {\n      if (isMatch && !err) {\n        const token = generateToken(user);\n        res.json({ token });\n      } else {\n        res.status(401).json({ message: 'Authentication failed. Wrong password.' });\n      }\n    });\n  } catch (error) {\n    res.status(500).json({ message: 'Error logging in user' });\n  }\n});\n\nmodule.exports = router;\n"
+      }
+    ]
+  }
+}

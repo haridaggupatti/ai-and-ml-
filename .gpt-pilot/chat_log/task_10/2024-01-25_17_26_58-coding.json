@@ -1,0 +1,25 @@
+{
+  "endpoint": "OPENAI",
+  "model": "gpt-4-1106-preview",
+  "functions": [
+    {
+      "name": "get_fully_coded_file",
+      "description": "Gets the fully coded file.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "file_content": {
+            "type": "string",
+            "description": "Fully coded file. This contains only the lines of code and no other text."
+          }
+        },
+        "required": [
+          "file_content"
+        ]
+      }
+    }
+  ],
+  "response": {
+    "file_content": "const tf = require('../utils/tf');\n\nconst { sequential, layers } = tf;\n\n// Define the model architecture\nconst buildModel = (inputShape) => {\n  const model = sequential();\n  model.add(layers.dense({ units: 64, activation: 'relu', inputShape: [inputShape] }));\n  model.add(layers.dense({ units: 64, activation: 'relu' }));\n  model.add(layers.dense({ units: 1, activation: 'sigmoid' }));\n\n  model.compile({\n    optimizer: tf.train.adam(),\n    loss: 'binaryCrossentropy',\n    metrics: ['accuracy'],\n  });\n\n  return model;\n};\n\nmodule.exports = {\n  buildModel,\n};"
+  }
+}

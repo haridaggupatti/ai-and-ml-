@@ -1,0 +1,57 @@
+{
+  "endpoint": "OPENAI",
+  "model": "gpt-4-1106-preview",
+  "functions": [
+    {
+      "name": "save_files",
+      "description": "Iterates over the files passed to this function and saves them on the disk.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "files": {
+            "type": "array",
+            "description": "List of files that need to be saved.",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "description": "Name of the file that needs to be saved on the disk."
+                },
+                "path": {
+                  "type": "string",
+                  "description": "Full path of the file with the file name that needs to be saved."
+                },
+                "content": {
+                  "type": "string",
+                  "description": "Full content of the file that needs to be saved on the disk. **IMPORTANT**When you want to add a comment that tells the user to add the previous implementation at that place, make sure that the comment starts with `[OLD CODE]` and add a description of what old code should be inserted here. For example, `[OLD CODE] Login route`."
+                },
+                "description": {
+                  "type": "string",
+                  "description": "Description of the file that needs to be saved on the disk. This description doesn't need to explain what is being done currently in this task but rather what is the idea behind this file - what do we want to put in this file in the future. Write the description ONLY if this is the first time this file is being saved. If this file already exists on the disk, leave this field empty."
+                }
+              },
+              "required": [
+                "name",
+                "path",
+                "content"
+              ]
+            }
+          }
+        },
+        "required": [
+          "files"
+        ]
+      }
+    }
+  ],
+  "response": {
+    "files": [
+      {
+        "name": "package.json",
+        "path": "/package.json",
+        "content": "{\n  \"name\": \"ai_and_ml_\",\n  \"version\": \"1.0.0\",\n  \"description\": \"\",\n  \"main\": \"index.js\",\n  \"scripts\": {\n    \"test\": \"echo \\\"Error: no test specified\\\" && exit 1\",\n    \"start\": \"node index.js\"\n  },\n  \"keywords\": [],\n  \"author\": \"\",\n  \"license\": \"ISC\",\n  \"dependencies\": {\n    \"bcrypt\": \"^5.1.1\",\n    \"bcryptjs\": \"^2.4.3\",\n    \"dotenv\": \"^16.3.1\",\n    \"express\": \"^4.18.2\",\n    \"jsonwebtoken\": \"^9.0.2\",\n    \"mongoose\": \"^8.1.0\"\n  }\n}\n"
+      }
+    ]
+  }
+}

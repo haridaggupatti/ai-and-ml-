@@ -1,0 +1,161 @@
+{
+  "endpoint": "OPENAI",
+  "model": "gpt-4-1106-preview",
+  "functions": [
+    {
+      "name": "parse_development_task",
+      "description": "Breaks down the development task into smaller steps that need to be done to implement the entire task.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "tasks": {
+            "type": "array",
+            "description": "List of smaller development steps that need to be done to complete the entire task.",
+            "items": {
+              "type": "object",
+              "description": "A smaller development step that needs to be done to complete the entire task.  Remember, if you need to run a command that doesn't finish by itself (eg. a command to run an  If you need to create a directory that doesn't exist and is not the root project directory, always create it by running a command `mkdir`",
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "enum": [
+                    "command",
+                    "code_change",
+                    "human_intervention"
+                  ],
+                  "description": "Type of the development step that needs to be done to complete the entire task."
+                },
+                "command": {
+                  "type": "object",
+                  "description": "Command that needs to be run to complete the current task. This should be used only if the task is of a type \"command\".",
+                  "properties": {
+                    "command": {
+                      "type": "string",
+                      "description": "A single command that needs to be executed."
+                    },
+                    "timeout": {
+                      "type": "number",
+                      "description": "Timeout in milliseconds that represent the approximate time this command takes to finish. If you need to run a command that doesnt't finish by itself (eg. a command to run an app), set the timeout to to a value long enough to determine that it has started successfully and provide a command_id. If you need to create a directory that doesn't exist and is not the root project directory, always create it by running a command `mkdir`"
+                    },
+                    "success_message": {
+                      "type": "string",
+                      "description": "A message to look for in the output of the command to determine if successful or not."
+                    },
+                    "command_id": {
+                      "type": "string",
+                      "description": "If the process needs to continue running after the command is executed provide a unique command identifier which you can use to kill the process later."
+                    }
+                  },
+                  "required": [
+                    "command",
+                    "timeout"
+                  ]
+                },
+                "code_change": {
+                  "type": "object",
+                  "description": "A code change that needs to be implemented. This should be used only if the task is of a type \"code_change\".",
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "description": "Name of the file that needs to be implemented."
+                    },
+                    "path": {
+                      "type": "string",
+                      "description": "Full path of the file with the file name that needs to be implemented."
+                    },
+                    "content": {
+                      "type": "string",
+                      "description": "Full content of the file that needs to be implemented. **IMPORTANT**When you want to add a comment that tells the user to add the previous implementation at that place, make sure that the comment starts with `[OLD CODE]` and add a description of what old code should be inserted here. For example, `[OLD CODE] Login route`."
+                    }
+                  },
+                  "required": [
+                    "name",
+                    "path",
+                    "content"
+                  ]
+                },
+                "human_intervention_description": {
+                  "type": "string",
+                  "description": "Description of a step in debugging this issue when there is a human intervention needed. This should be used only if the task is of a type \"human_intervention\"."
+                }
+              },
+              "required": [
+                "type"
+              ]
+            }
+          }
+        },
+        "required": [
+          "tasks"
+        ]
+      }
+    }
+  ],
+  "response": {
+    "tasks": [
+      {
+        "type": "code_change",
+        "code_change": {
+          "name": "Feedback.js",
+          "path": "./models/Feedback.js",
+          "content": "const mongoose = require('mongoose');\n\nconst FeedbackSchema = new mongoose.Schema({\n  userId: {\n    type: mongoose.Schema.Types.ObjectId,\n    required: true,\n    ref: 'User'\n  },\n  strategyAdjustments: {\n    type: Map,\n    of: Number,\n    required: true\n  },\n  createdAt: {\n    type: Date,\n    default: Date.now\n  }\n});\n\nmodule.exports = mongoose.model('Feedback', FeedbackSchema);\n"
+        }
+      },
+      {
+        "type": "code_change",
+        "code_change": {
+          "name": "feedbackRoutes.js",
+          "path": "./routes/feedbackRoutes.js",
+          "content": "const express = require('express');\nconst { submitFeedback, getLatestFeedback } = require('../controllers/feedbackController');\nconst authMiddleware = require('../middlewares/authMiddleware');\nconst router = express.Router();\n\nrouter.post('/submit', authMiddleware, submitFeedback);\nrouter.get('/latest', authMiddleware, getLatestFeedback);\n\nmodule.exports = router;\n"
+        }
+      },
+      {
+        "type": "code_change",
+        "code_change": {
+          "name": "feedbackController.js",
+          "path": "./controllers/feedbackController.js",
+          "content": "const Feedback = require('../models/Feedback');\n\nexports.submitFeedback = async (req, res) => {\n  const { userId, strategyAdjustments } = req.body;\n\n  try {\n    const feedback = new Feedback({\n      userId,\n      strategyAdjustments\n    });\n    await feedback.save();\n    res.status(201).json({ message: 'Feedback submitted successfully', feedback });\n  } catch(error) {\n    res.status(500).json({ message: 'Failed to submit feedback', error: error.message });\n  }\n};\n\nexports.getLatestFeedback = async (req, res) => {\n  const userId = req.user._id;\n\n  try {\n    const latestFeedback = await Feedback.findOne({ userId }).sort({ createdAt: -1 });\n    res.status(200).json(latestFeedback);\n  } catch(error) {\n    res.status(500).json({ message: 'Failed to fetch latest feedback', error: error.message });\n  }\n};\n"
+        }
+      },
+      {
+        "type": "code_change",
+        "code_change": {
+          "name": "strategyService.js",
+          "path": "./services/strategyService.js",
+          "content": "const Feedback = require('../models/Feedback');\n\nexports.applyFeedbackToStrategy = async (userId, currentStrategyConfig) => {\n  const latestFeedbackEntry = await Feedback.findOne({ userId }).sort({ createdAt: -1 });\n\n  if (!latestFeedbackEntry) {\n    return currentStrategyConfig; // No feedback provided, return the current config unchanged.\n  }\n\n  for (const [parameter, adjustment] of latestFeedbackEntry.strategyAdjustments) {\n    if (ParameterValidationService.isValidAdjustment(parameter, adjustment)) {\n      currentStrategyConfig[parameter] += adjustment;\n    }\n    // Additional logic to validate and limit the adjustments can be added here.\n  }\n\n  return currentStrategyConfig;\n};\n\n// We would need additional validation here. Example service to validate adjustments:\nclass ParameterValidationService {\n  static isValidAdjustment(parameter, value) {\n    // Implement validation logic specific to each strategy parameter.\n    return true; // replace with validation logic\n  }\n}\n"
+        }
+      },
+      {
+        "type": "code_change",
+        "code_change": {
+          "name": "decisionMaker.js",
+          "path": "./ai/decisionMaker.js",
+          "content": "const { applyFeedbackToStrategy } = require('../services/strategyService');\n\nexports.makeDecision = async (userId, baseStrategyConfig, marketData) => {\n  let strategyConfig = await applyFeedbackToStrategy(userId, baseStrategyConfig);\n  \n  // AI decision making process with the updated strategyConfig\n  // ...\n\n  // [OLD CODE] Insert the prior decision making logic here that utilizes strategyConfig\n\n  return decision;\n};\n"
+        }
+      },
+      {
+        "type": "code_change",
+        "code_change": {
+          "name": "index.js",
+          "path": "./index.js",
+          "content": "// [OLD CODE] Include all previous middleware and routes before this\nconst feedbackRoutes = require('./routes/feedbackRoutes');\n\napp.use('/api/feedback', feedbackRoutes);\n\n// [OLD CODE] Include the rest of the server setup and listening code"
+        }
+      },
+      {
+        "type": "command",
+        "command": {
+          "command": "npm install",
+          "timeout": 60000
+        }
+      },
+      {
+        "type": "command",
+        "command": {
+          "command": "npm run start",
+          "timeout": 10000,
+          "success_message": "Server is running",
+          "command_id": "start_server"
+        }
+      }
+    ]
+  }
+}

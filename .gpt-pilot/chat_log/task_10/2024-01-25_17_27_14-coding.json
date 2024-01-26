@@ -1,0 +1,25 @@
+{
+  "endpoint": "OPENAI",
+  "model": "gpt-4-1106-preview",
+  "functions": [
+    {
+      "name": "get_fully_coded_file",
+      "description": "Gets the fully coded file.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "file_content": {
+            "type": "string",
+            "description": "Fully coded file. This contains only the lines of code and no other text."
+          }
+        },
+        "required": [
+          "file_content"
+        ]
+      }
+    }
+  ],
+  "response": {
+    "file_content": "const tf = require('../utils/tf');\nconst { buildModel } = require('./strategyModel');\nconst dataPreprocessor = require('./dataPreprocessor');\n\nconst trainModel = async (historicalData, strategyParameters) => {\n  const { lookbackPeriod } = strategyParameters;\n  const { xs, ys } = dataPreprocessor.prepareTrainingData(historicalData, lookbackPeriod);\n\n  const model = buildModel(xs.shape[1]);\n\n  await model.fit(xs, ys, {\n    batchSize: 32,\n    epochs: 100,\n    validationSplit: 0.2,\n  });\n\n  return model;\n};\n\nmodule.exports = {\n  trainModel,\n};"
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "endpoint": "OPENAI",
+  "model": "gpt-4-1106-preview",
+  "functions": [
+    {
+      "name": "get_fully_coded_file",
+      "description": "Gets the fully coded file.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "file_content": {
+            "type": "string",
+            "description": "Fully coded file. This contains only the lines of code and no other text."
+          }
+        },
+        "required": [
+          "file_content"
+        ]
+      }
+    }
+  ],
+  "response": {
+    "file_content": "const MetaApi = require('metaapi.cloud-sdk').default;\n\nclass MetaApiConnection {\n  constructor(metaApiKey, accountId) {\n    if (!metaApiKey || !accountId) {\n      throw new Error('MetaApi key or account ID is missing.');\n    }\n    this.api = new MetaApi(metaApiKey);\n    this.accountId = accountId;\n  }\n\n  async connect() {\n    try {\n      const account = await this.api.metatraderAccountApi.getAccount(this.accountId);\n      const connection = await account.connect();\n      console.log(`Connected to ${account.name}, connection id is ${connection.id}.`);\n      return connection;\n    } catch (error) {\n      console.error(`Error during MetaApi connection: ${error.message}`);\n      throw error;\n    }\n  }\n\n  async applyRiskParameters(account, tradeId, stopLoss, takeProfit) {\n    try {\n      let modifyTradePayload = {\n        type: 'POSITION_MODIFY',\n        positionId: tradeId,\n        stopLoss: stopLoss,\n        takeProfit: takeProfit\n      };\n      await account.modifyPosition(tradeId, modifyTradePayload);\n      console.log(`Modified trade ${tradeId} with stopLoss: ${stopLoss}, takeProfit: ${takeProfit}`);\n    } catch (error) {\n      console.error(`Error applying risk parameters to MetaTrader: ${error.message}`);\n      throw error;\n    }\n  }\n}\n\nmodule.exports = MetaApiConnection;\n"
+  }
+}

@@ -1,0 +1,159 @@
+{
+  "endpoint": "OPENAI",
+  "model": "gpt-4-1106-preview",
+  "functions": [
+    {
+      "name": "start_debugging",
+      "description": "Starts the debugging process based on the list of steps that need to be done to debug the problem.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "thoughts": {
+            "type": "string",
+            "description": "Thoughts that you have about the problem that you are trying to debug."
+          },
+          "reasoning": {
+            "type": "string"
+          },
+          "steps": {
+            "type": "array",
+            "description": "List of steps that need to be done to debug the problem.",
+            "items": {
+              "type": "object",
+              "description": "A single step that needs to be done to get closer to debugging this issue.  Remember, if you need to run a command that doesn't finish by itself (eg. a command to run an app), put the timeout to 3000 milliseconds. If you need to create a directory that doesn't exist and is not the root project directory, always create it by running a command `mkdir`",
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "enum": [
+                    "command",
+                    "code_change",
+                    "human_intervention"
+                  ],
+                  "description": "Type of the step that needs to be done to debug this issue."
+                },
+                "command": {
+                  "type": "object",
+                  "description": "Command that needs to be run to complete the current task. This should be used only if the task is of a type \"command\".",
+                  "properties": {
+                    "command": {
+                      "type": "string",
+                      "description": "Command that needs to be run to debug this issue."
+                    },
+                    "timeout": {
+                      "type": "number",
+                      "description": "Timeout in milliseconds that represent the approximate time this command takes to finish. If you need to run a command that doesn't finish by itself (eg. a command to run an app), put the timeout to 3000 milliseconds."
+                    },
+                    "success_message": {
+                      "type": "string",
+                      "description": "A message to look for in the output of the command to determine if successful or not."
+                    },
+                    "command_id": {
+                      "type": "string",
+                      "description": "If the process needs to continue running after the command is executed provide a unique command identifier which you can use to kill the process later."
+                    }
+                  },
+                  "required": [
+                    "command",
+                    "timeout"
+                  ]
+                },
+                "code_change_description": {
+                  "type": "string",
+                  "description": "Description of a step in debugging this issue when there are code changes required. This should be used only if the task is of a type \"code_change\" and it should thoroughly describe what needs to be done to implement the code change for a single file - it cannot include changes for multiple files."
+                },
+                "human_intervention_description": {
+                  "type": "string",
+                  "description": "Description of a step in debugging this issue when there is a human intervention needed. This should be used only if the task is of a type \"human_intervention\"."
+                },
+                "need_to_see_output": {
+                  "type": "boolean",
+                  "description": "Set to `true` if the definition of subsequent steps may need to change after you see the output of a successful execution of this step. For example, if the purpose of a command is to check the status of a service or contents of a file before deciding how to proceed then this flag should be set to `true`. If subsequent steps can be executed as long as this step is successful, then this flag does not need to be set."
+                },
+                "check_if_fixed": {
+                  "type": "boolean",
+                  "description": "Flag that indicates if the original command that triggered the error that's being debugged should be tried after this step to check if the error is fixed. If you think that the original command `delete node_modules/ && delete package-lock.json` will pass after this step, then this flag should be set to TRUE and if you think that the original command will still fail after this step, then this flag should be set to `false`."
+                }
+              },
+              "required": [
+                "type",
+                "check_if_fixed"
+              ]
+            }
+          }
+        },
+        "required": [
+          "thoughts",
+          "reasoning",
+          "steps"
+        ]
+      }
+    }
+  ],
+  "response": {
+    "thoughts": "The EPERM error indicates a permission issue, which could be caused by the node_modules directory being in use by another process or lacking required permissions. The 404 error indicates the pre-built binary for the specified version of TensorFlow.js for Node.js is not found, and the installation process is attempting to compile from the source instead.",
+    "reasoning": "To resolve the permission issue, we should ensure all processes that might be using files within node_modules are terminated. Then, retry the initial cleanup. Since the TensorFlow.js pre-built binary is not found, manual compiling may be required using node-gyp, which requires Python and build tools to be installed.",
+    "steps": [
+      {
+        "type": "human_intervention",
+        "human_intervention_description": "Ensure that no editors or IDEs have the project open, which could cause file locks in the node_modules directory.",
+        "check_if_fixed": false
+      },
+      {
+        "type": "command",
+        "command": {
+          "command": "taskkill /F /IM node.exe",
+          "timeout": 5000
+        },
+        "check_if_fixed": false
+      },
+      {
+        "type": "command",
+        "command": {
+          "command": "npm cache clean --force",
+          "timeout": 5000
+        },
+        "check_if_fixed": false
+      },
+      {
+        "type": "command",
+        "command": {
+          "command": "rmdir /s /q node_modules",
+          "timeout": 5000
+        },
+        "check_if_fixed": false
+      },
+      {
+        "type": "command",
+        "command": {
+          "command": "del package-lock.json",
+          "timeout": 5000
+        },
+        "check_if_fixed": false
+      },
+      {
+        "type": "command",
+        "command": {
+          "command": "npm install --global windows-build-tools",
+          "timeout": 300000
+        },
+        "check_if_fixed": false
+      },
+      {
+        "type": "command",
+        "command": {
+          "command": "npm install --global node-gyp",
+          "timeout": 5000
+        },
+        "check_if_fixed": false
+      },
+      {
+        "type": "command",
+        "command": {
+          "command": "npm install @tensorflow/tfjs-node",
+          "timeout": 300000
+        },
+        "check_if_fixed": true
+      }
+    ]
+  }
+}

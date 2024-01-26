@@ -1,0 +1,57 @@
+{
+  "endpoint": "OPENAI",
+  "model": "gpt-4-1106-preview",
+  "functions": [
+    {
+      "name": "save_files",
+      "description": "Iterates over the files passed to this function and saves them on the disk.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "files": {
+            "type": "array",
+            "description": "List of files that need to be saved.",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "description": "Name of the file that needs to be saved on the disk."
+                },
+                "path": {
+                  "type": "string",
+                  "description": "Full path of the file with the file name that needs to be saved."
+                },
+                "content": {
+                  "type": "string",
+                  "description": "Full content of the file that needs to be saved on the disk. **IMPORTANT**When you want to add a comment that tells the user to add the previous implementation at that place, make sure that the comment starts with `[OLD CODE]` and add a description of what old code should be inserted here. For example, `[OLD CODE] Login route`."
+                },
+                "description": {
+                  "type": "string",
+                  "description": "Description of the file that needs to be saved on the disk. This description doesn't need to explain what is being done currently in this task but rather what is the idea behind this file - what do we want to put in this file in the future. Write the description ONLY if this is the first time this file is being saved. If this file already exists on the disk, leave this field empty."
+                }
+              },
+              "required": [
+                "name",
+                "path",
+                "content"
+              ]
+            }
+          }
+        },
+        "required": [
+          "files"
+        ]
+      }
+    }
+  ],
+  "response": {
+    "files": [
+      {
+        "name": "tradingOrchestrator.js",
+        "path": "/services/tradingOrchestrator.js",
+        "content": "const axios = require('axios');\nconst TradeController = require('../controllers/TradeController');\nconst { applyFeedbackToStrategy } = require('./strategyService');\nconst { makeDecision } = require('../ai/decisionMaker');\nconst { fetchAccountGrowthData } = require('../controllers/grafController');\nconst { prepareTrainingData } = require('../ai/dataPreprocessor');\nconst { trainModel } = require('../ai/trainModel');\nconst logger = require('../utils/logger');\nrequire('dotenv').config();\nconst MetaApiConnection = require('../utils/metaApiConnection');\nconst MetaApiClient = require('../utils/metaApiClient');\n\n/*\n  Trading Orchestrator is responsible for coordinating the different parts\n  of the trading application. It oversees the flow of data between the\n  system components, executes trading logic and manages the interaction\n  with external APIs.\n*/\n\nclass TradingOrchestrator {\n  constructor() {\n    this.metaApiConnection = new MetaApiConnection(process.env.DEMO_META_API_KEY, process.env.DEMO_META_API_ACCOUNT_ID);\n    this.tradeController = new TradeController(this.metaApiConnection);\n    this.dataProcessor = new DataProcessor(this.metaApiConnection);\n  }\n\n  async startDemoTrading(user) {\n    try {\n      const marketData = await axios.get(process.env.DEMO_API_ENDPOINT);\n      const strategyConfig = await applyFeedbackToStrategy(user._id, {});\n      const decision = await makeDecision(user._id, strategyConfig, marketData);\n      if (decision.shouldTrade) {\n        await this.tradeController.executeTrade(marketData, decision.tradeId);\n      }\n      const grafData = await fetchAccountGrowthData();\n      // [OLD CODE] Add previous implementation for visualizeWithGraf\n    } catch (error) {\n      logger.error(`Error during demo trading: ${error.message}`);\n    }\n  }\n\n  // [OLD CODE] Add any other methods that were previously implemented\n}\n\nmodule.exports = TradingOrchestrator;\n"
+      }
+    ]
+  }
+}

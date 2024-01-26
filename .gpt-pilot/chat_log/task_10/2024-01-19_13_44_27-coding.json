@@ -1,0 +1,25 @@
+{
+  "endpoint": "OPENAI",
+  "model": "gpt-4-1106-preview",
+  "functions": [
+    {
+      "name": "get_fully_coded_file",
+      "description": "Gets the fully coded file.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "file_content": {
+            "type": "string",
+            "description": "Fully coded file. This contains only the lines of code and no other text."
+          }
+        },
+        "required": [
+          "file_content"
+        ]
+      }
+    }
+  ],
+  "response": {
+    "file_content": "const axios = require('axios');\nconst TradeController = require('../controllers/tradeController');\nconst { makeDecision } = require('../ai/decisionMaker');\nconst { DataProcessor } = require('../ai/dataProcessor');\nconst { MetaApiClient } = require('./metaApiClient');\nconst { fetchAccountGrowthData } = require('../controllers/grafController');\nconst { prepareTrainingData } = require('../ai/dataPreprocessor');\nconst { trainModel } = require('../ai/trainModel');\nconst { applyFeedbackToStrategy } = require('./strategyService');\n\nclass TradingOrchestrator {\n  constructor() {\n    this.tradeController = new TradeController();\n    this.dataProcessor = new DataProcessor(new MetaApiClient(process.env.META_API_KEY));\n  }\n\n  async startDemoTrading(user) {\n    try {\n      // Fetch market data\n      const marketData = await this.fetchDemoMarketData();\n\n      // Apply user feedback to strategy configuration\n      const strategyConfig = await applyFeedbackToStrategy(user._id, /* Base strategy configuration object */);\n\n      // Make trading decision based on AI analysis\n      const decision = await makeDecision(user._id, strategyConfig, marketData);\n\n      // Execute trade if decision is affirmative\n      if (decision.shouldTrade) {\n        await this.tradeController.executeTrade(marketData, decision.tradeId);\n      }\n\n      // Visualize results using Graf\n      const grafData = await fetchAccountGrowthData();\n      this.visualizeWithGraf(grafData);\n\n      // Train model with new data (Here you would capture new live training data and retrain periodically)\n      const { xs, ys } = prepareTrainingData(marketData);\n      await trainModel(xs, ys, strategyConfig);\n    } catch (error) {\n      console.error(`Error during demo trading: ${error.message}`);\n      // Handle error\n    }\n  }\n\n  async fetchDemoMarketData() {\n    const accountId = process.env.META_API_ACCOUNT_ID; // INPUT_REQUIRED: Replace with your MetaApi account ID\n    // Sample static market data\n    // Replace this with the actual call to fetch data from MetaApi or other source\n    return [\n      { time: '2023-04-01T00:00:00.000Z', open: 1.1234, high: 1.1240, low: 1.1230, close: 1.1238 }\n      // ... more data\n    ];\n  }\n\n  visualizeWithGraf(data) {\n    // Logic for using D3.js to visualize data\n    // This might involve sending data to a frontend component or constructing a visualization server-side\n  }\n}\n\nmodule.exports = TradingOrchestrator;\n"
+  }
+}

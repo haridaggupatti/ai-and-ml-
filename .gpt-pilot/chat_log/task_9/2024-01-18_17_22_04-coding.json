@@ -1,0 +1,112 @@
+{
+  "endpoint": "OPENAI",
+  "model": "gpt-4-1106-preview",
+  "functions": [
+    {
+      "name": "parse_development_task",
+      "description": "Breaks down the development task into smaller steps that need to be done to implement the entire task.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "tasks": {
+            "type": "array",
+            "description": "List of smaller development steps that need to be done to complete the entire task.",
+            "items": {
+              "type": "object",
+              "description": "A smaller development step that needs to be done to complete the entire task.  Remember, if you need to run a command that doesn't finish by itself (eg. a command to run an  If you need to create a directory that doesn't exist and is not the root project directory, always create it by running a command `mkdir`",
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "enum": [
+                    "command",
+                    "code_change",
+                    "human_intervention"
+                  ],
+                  "description": "Type of the development step that needs to be done to complete the entire task."
+                },
+                "command": {
+                  "type": "object",
+                  "description": "Command that needs to be run to complete the current task. This should be used only if the task is of a type \"command\".",
+                  "properties": {
+                    "command": {
+                      "type": "string",
+                      "description": "A single command that needs to be executed."
+                    },
+                    "timeout": {
+                      "type": "number",
+                      "description": "Timeout in milliseconds that represent the approximate time this command takes to finish. If you need to run a command that doesnt't finish by itself (eg. a command to run an app), set the timeout to to a value long enough to determine that it has started successfully and provide a command_id. If you need to create a directory that doesn't exist and is not the root project directory, always create it by running a command `mkdir`"
+                    },
+                    "success_message": {
+                      "type": "string",
+                      "description": "A message to look for in the output of the command to determine if successful or not."
+                    },
+                    "command_id": {
+                      "type": "string",
+                      "description": "If the process needs to continue running after the command is executed provide a unique command identifier which you can use to kill the process later."
+                    }
+                  },
+                  "required": [
+                    "command",
+                    "timeout"
+                  ]
+                },
+                "code_change": {
+                  "type": "object",
+                  "description": "A code change that needs to be implemented. This should be used only if the task is of a type \"code_change\".",
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "description": "Name of the file that needs to be implemented."
+                    },
+                    "path": {
+                      "type": "string",
+                      "description": "Full path of the file with the file name that needs to be implemented."
+                    },
+                    "content": {
+                      "type": "string",
+                      "description": "Full content of the file that needs to be implemented. **IMPORTANT**When you want to add a comment that tells the user to add the previous implementation at that place, make sure that the comment starts with `[OLD CODE]` and add a description of what old code should be inserted here. For example, `[OLD CODE] Login route`."
+                    }
+                  },
+                  "required": [
+                    "name",
+                    "path",
+                    "content"
+                  ]
+                },
+                "human_intervention_description": {
+                  "type": "string",
+                  "description": "Description of a step in debugging this issue when there is a human intervention needed. This should be used only if the task is of a type \"human_intervention\"."
+                }
+              },
+              "required": [
+                "type"
+              ]
+            }
+          }
+        },
+        "required": [
+          "tasks"
+        ]
+      }
+    }
+  ],
+  "response": {
+    "tasks": [
+      {
+        "type": "command",
+        "command": {
+          "command": "npm install axios",
+          "timeout": 60000
+        }
+      },
+      {
+        "type": "code_change",
+        "code_change": {
+          "name": "tradingOrchestrator.js",
+          "path": "/services/tradingOrchestrator.js",
+          "content": "const axios = require('axios');\nconst TradeController = require('../controllers/tradeController');\nconst { makeDecision } = require('../ai/decisionMaker');\nconst { DataProcessor } = require('../ai/dataProcessor');\nconst { MetaApiClient } = require('./metaApiClient');\nconst { fetchAccountGrowthData } = require('../controllers/grafController');\nconst { prepareTrainingData } = require('../ai/dataPreprocessor');\nconst { trainModel } = require('../ai/trainModel');\nconst { applyFeedbackToStrategy } = require('./strategyService');\n\nclass TradingOrchestrator {\n  constructor() {\n    this.tradeController = new TradeController();\n    this.dataProcessor = new DataProcessor(new MetaApiClient(process.env.META_API_KEY));\n  }\n\n  async startDemoTrading(user) {\n    try {\n      // Fetch market data\n      const marketData = await this.fetchDemoMarketData();\n\n      // Apply user feedback to strategy configuration\n      const strategyConfig = await applyFeedbackToStrategy(user._id, /* Base strategy configuration object */);\n\n      // Make trading decision based on AI analysis\n      const decision = await makeDecision(user._id, strategyConfig, marketData);\n\n      // Execute trade if decision is affirmative\n      if (decision.shouldTrade) {\n        await this.tradeController.executeTrade(marketData, decision.tradeId);\n      }\n\n      // Visualize results using Graf\n      const grafData = await fetchAccountGrowthData();\n      this.visualizeWithGraf(grafData);\n\n      // Train model with new data (Here you would capture new live training data and retrain periodically)\n      const { xs, ys } = prepareTrainingData(marketData);\n      await trainModel(xs, ys, strategyConfig);\n    } catch (error) {\n      console.error(`Error during demo trading: ${error.message}`);\n      // Handle error\n    }\n  }\n\n  async fetchDemoMarketData() {\n    // Placeholder logic for fetching demo market data\n    // In practice, this would use MetaApiClient or another service to fetch demo data\n    return axios.get('http://demo.api/marketdata');\n  }\n\n  visualizeWithGraf(data) {\n    // Logic for using D3.js to visualize data\n    // This might involve sending data to a frontend component or constructing a visualization server-side\n  }\n}\nmodule.exports = TradingOrchestrator;\n"
+        }
+      }
+    ]
+  }
+}

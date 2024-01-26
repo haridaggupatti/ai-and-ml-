@@ -1,0 +1,136 @@
+{
+  "endpoint": "OPENAI",
+  "model": "gpt-4-1106-preview",
+  "functions": [
+    {
+      "name": "parse_development_task",
+      "description": "Breaks down the development task into smaller steps that need to be done to implement the entire task.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "tasks": {
+            "type": "array",
+            "description": "List of smaller development steps that need to be done to complete the entire task.",
+            "items": {
+              "type": "object",
+              "description": "A smaller development step that needs to be done to complete the entire task.  Remember, if you need to run a command that doesn't finish by itself (eg. a command to run an  If you need to create a directory that doesn't exist and is not the root project directory, always create it by running a command `mkdir`",
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "enum": [
+                    "command",
+                    "code_change",
+                    "human_intervention"
+                  ],
+                  "description": "Type of the development step that needs to be done to complete the entire task."
+                },
+                "command": {
+                  "type": "object",
+                  "description": "Command that needs to be run to complete the current task. This should be used only if the task is of a type \"command\".",
+                  "properties": {
+                    "command": {
+                      "type": "string",
+                      "description": "A single command that needs to be executed."
+                    },
+                    "timeout": {
+                      "type": "number",
+                      "description": "Timeout in milliseconds that represent the approximate time this command takes to finish. If you need to run a command that doesnt't finish by itself (eg. a command to run an app), set the timeout to to a value long enough to determine that it has started successfully and provide a command_id. If you need to create a directory that doesn't exist and is not the root project directory, always create it by running a command `mkdir`"
+                    },
+                    "success_message": {
+                      "type": "string",
+                      "description": "A message to look for in the output of the command to determine if successful or not."
+                    },
+                    "command_id": {
+                      "type": "string",
+                      "description": "If the process needs to continue running after the command is executed provide a unique command identifier which you can use to kill the process later."
+                    }
+                  },
+                  "required": [
+                    "command",
+                    "timeout"
+                  ]
+                },
+                "code_change": {
+                  "type": "object",
+                  "description": "A code change that needs to be implemented. This should be used only if the task is of a type \"code_change\".",
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "description": "Name of the file that needs to be implemented."
+                    },
+                    "path": {
+                      "type": "string",
+                      "description": "Full path of the file with the file name that needs to be implemented."
+                    },
+                    "content": {
+                      "type": "string",
+                      "description": "Full content of the file that needs to be implemented. **IMPORTANT**When you want to add a comment that tells the user to add the previous implementation at that place, make sure that the comment starts with `[OLD CODE]` and add a description of what old code should be inserted here. For example, `[OLD CODE] Login route`."
+                    }
+                  },
+                  "required": [
+                    "name",
+                    "path",
+                    "content"
+                  ]
+                },
+                "human_intervention_description": {
+                  "type": "string",
+                  "description": "Description of a step in debugging this issue when there is a human intervention needed. This should be used only if the task is of a type \"human_intervention\"."
+                }
+              },
+              "required": [
+                "type"
+              ]
+            }
+          }
+        },
+        "required": [
+          "tasks"
+        ]
+      }
+    }
+  ],
+  "response": {
+    "tasks": [
+      {
+        "type": "command",
+        "command": {
+          "command": "npm install @tensorflow/tfjs @tensorflow/tfjs-node",
+          "timeout": 120000
+        }
+      },
+      {
+        "type": "code_change",
+        "code_change": {
+          "name": "strategyModel.js",
+          "path": "/ai/strategyModel.js",
+          "content": "const tf = require('@tensorflow/tfjs');\nrequire('@tensorflow/tfjs-node');\nconst { sequential, layers } = tf;\n\n// Define the model architecture\nconst buildModel = (inputShape) => {\n  const model = sequential();\n  model.add(layers.dense({ units: 64, activation: 'relu', inputShape: [inputShape] }));\n  model.add(layers.dense({ units: 64, activation: 'relu' }));\n  model.add(layers.dense({ units: 1, activation: 'sigmoid' }));\n\n  model.compile({\n    optimizer: tf.train.adam(),\n    loss: 'binaryCrossentropy',\n    metrics: ['accuracy'],\n  });\n\n  return model;\n};\n\nmodule.exports = {\n  buildModel,\n};"
+        }
+      },
+      {
+        "type": "code_change",
+        "code_change": {
+          "name": "strategyInputParser.js",
+          "path": "/ai/strategyInputParser.js",
+          "content": "// A hypothetical function that parses a user-defined strategy written in normal language\n// and converts it into a set of parameters that can be understood by our ML model.\nconst parseStrategy = (strategyDescription) => {\n  // Parsing logic goes here\n  // For now, we will just return an example fixed set of parameters.\n  return {\n    lookbackPeriod: 14,\n    // ... other parameters based on the strategy input\n  };\n};\n\nmodule.exports = {\n  parseStrategy,\n};"
+        }
+      },
+      {
+        "type": "code_change",
+        "code_change": {
+          "name": "trainModel.js",
+          "path": "/ai/trainModel.js",
+          "content": "const { buildModel } = require('./strategyModel');\nconst dataPreprocessor = require('./dataPreprocessor');\n\nconst trainModel = async (historicalData, strategyParameters) => {\n  const { lookbackPeriod } = strategyParameters;\n  const { xs, ys } = dataPreprocessor.prepareTrainingData(historicalData, lookbackPeriod);\n\n  const model = buildModel(xs.shape[1]);\n\n  await model.fit(xs, ys, {\n    batchSize: 32,\n    epochs: 100,\n    validationSplit: 0.2,\n  });\n\n  return model;\n};\n\nmodule.exports = {\n  trainModel,\n};"
+        }
+      },
+      {
+        "type": "code_change",
+        "code_change": {
+          "name": "dataPreprocessor.js",
+          "path": "/ai/dataPreprocessor.js",
+          "content": "const tf = require('@tensorflow/tfjs');\n\n// Function to format historical market data for training\nconst prepareTrainingData = (historicalData, lookbackPeriod) => {\n  // Logic to preprocess data goes here. This should include feature selection,\n  // normalization, and creation of labels for supervised learning.\n  // This is a placeholder; actual implementation will depend on the details of the raw data.\n  const xs = tf.tensor2d(historicalData.xxx); // INPUT_REQUIRED {Replace 'xxx' with the correct data extraction logic for features}\n  const ys = tf.tensor1d(historicalData.yyy); // INPUT_REQUIRED {Replace 'yyy' with the correct data extraction logic for labels}\n\n  return { xs, ys };\n};\n\nmodule.exports = {\n  prepareTrainingData,\n};"
+        }
+      }
+    ]
+  }
+}

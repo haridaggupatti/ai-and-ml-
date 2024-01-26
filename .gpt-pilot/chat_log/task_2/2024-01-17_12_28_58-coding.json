@@ -1,0 +1,169 @@
+{
+  "endpoint": "OPENAI",
+  "model": "gpt-4-1106-preview",
+  "functions": [
+    {
+      "name": "parse_development_task",
+      "description": "Breaks down the development task into smaller steps that need to be done to implement the entire task.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "tasks": {
+            "type": "array",
+            "description": "List of smaller development steps that need to be done to complete the entire task.",
+            "items": {
+              "type": "object",
+              "description": "A smaller development step that needs to be done to complete the entire task.  Remember, if you need to run a command that doesn't finish by itself (eg. a command to run an  If you need to create a directory that doesn't exist and is not the root project directory, always create it by running a command `mkdir`",
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "enum": [
+                    "command",
+                    "code_change",
+                    "human_intervention"
+                  ],
+                  "description": "Type of the development step that needs to be done to complete the entire task."
+                },
+                "command": {
+                  "type": "object",
+                  "description": "Command that needs to be run to complete the current task. This should be used only if the task is of a type \"command\".",
+                  "properties": {
+                    "command": {
+                      "type": "string",
+                      "description": "A single command that needs to be executed."
+                    },
+                    "timeout": {
+                      "type": "number",
+                      "description": "Timeout in milliseconds that represent the approximate time this command takes to finish. If you need to run a command that doesnt't finish by itself (eg. a command to run an app), set the timeout to to a value long enough to determine that it has started successfully and provide a command_id. If you need to create a directory that doesn't exist and is not the root project directory, always create it by running a command `mkdir`"
+                    },
+                    "success_message": {
+                      "type": "string",
+                      "description": "A message to look for in the output of the command to determine if successful or not."
+                    },
+                    "command_id": {
+                      "type": "string",
+                      "description": "If the process needs to continue running after the command is executed provide a unique command identifier which you can use to kill the process later."
+                    }
+                  },
+                  "required": [
+                    "command",
+                    "timeout"
+                  ]
+                },
+                "code_change": {
+                  "type": "object",
+                  "description": "A code change that needs to be implemented. This should be used only if the task is of a type \"code_change\".",
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "description": "Name of the file that needs to be implemented."
+                    },
+                    "path": {
+                      "type": "string",
+                      "description": "Full path of the file with the file name that needs to be implemented."
+                    },
+                    "content": {
+                      "type": "string",
+                      "description": "Full content of the file that needs to be implemented. **IMPORTANT**When you want to add a comment that tells the user to add the previous implementation at that place, make sure that the comment starts with `[OLD CODE]` and add a description of what old code should be inserted here. For example, `[OLD CODE] Login route`."
+                    }
+                  },
+                  "required": [
+                    "name",
+                    "path",
+                    "content"
+                  ]
+                },
+                "human_intervention_description": {
+                  "type": "string",
+                  "description": "Description of a step in debugging this issue when there is a human intervention needed. This should be used only if the task is of a type \"human_intervention\"."
+                }
+              },
+              "required": [
+                "type"
+              ]
+            }
+          }
+        },
+        "required": [
+          "tasks"
+        ]
+      }
+    }
+  ],
+  "response": {
+    "tasks": [
+      {
+        "type": "command",
+        "command": {
+          "command": "npm install bcrypt jsonwebtoken dotenv",
+          "timeout": 60000
+        }
+      },
+      {
+        "type": "code_change",
+        "code_change": {
+          "name": ".env",
+          "path": "/.env",
+          "content": "JWT_SECRET=YourVerySecretKey\n"
+        }
+      },
+      {
+        "type": "code_change",
+        "code_change": {
+          "name": "User.js",
+          "path": "/models/User.js",
+          "content": "const mongoose = require('mongoose');\nconst bcrypt = require('bcryptjs');\n\nconst UserSchema = new mongoose.Schema({\n  username: {\n    type: String,\n    unique: true,\n    required: true\n  },\n  password: {\n    type: String,\n    required: true\n  }\n});\n\nUserSchema.pre('save', function(next) {\n  if (this.isModified('password') || this.isNew) {\n    const salt = bcrypt.genSaltSync(10);\n    this.password = bcrypt.hashSync(this.password, salt);\n  }\n  next();\n});\n\nUserSchema.methods.comparePassword = function(pw, cb) {\n  bcrypt.compare(pw, this.password, (err, isMatch) => {\n    if (err) {\n      return cb(err);\n    }\n    cb(null, isMatch);\n  });\n};\n\nmodule.exports = mongoose.model('User', UserSchema);\n"
+        }
+      },
+      {
+        "type": "code_change",
+        "code_change": {
+          "name": "jwtUtils.js",
+          "path": "/utils/jwtUtils.js",
+          "content": "const jwt = require('jsonwebtoken');\nrequire('dotenv').config();\n\nconst JWT_SECRET = process.env.JWT_SECRET;\n\nconst generateToken = (user) => {\n  return jwt.sign({ userId: user._id }, JWT_SECRET);\n};\n\nconst verifyToken = (token) => {\n  try {\n    return jwt.verify(token, JWT_SECRET);\n  } catch (e) {\n    return null;\n  }\n};\n\nmodule.exports = {\n  generateToken,\n  verifyToken\n};\n"
+        }
+      },
+      {
+        "type": "code_change",
+        "code_change": {
+          "name": "authRoutes.js",
+          "path": "/routes/authRoutes.js",
+          "content": "const express = require('express');\nconst User = require('../models/User');\nconst bcrypt = require('bcryptjs');\nconst { generateToken } = require('../utils/jwtUtils');\n\nconst router = express.Router();\n\nrouter.post('/register', async (req, res) => {\n  try {\n    const { username, password } = req.body;\n    let user = await User.findOne({ username });\n    if (user) {\n      return res.status(400).json({ message: 'User already exists' });\n    }\n    user = new User({ username, password });\n    await user.save();\n    const token = generateToken(user);\n    res.status(201).json({ token });\n  } catch (error) {\n    res.status(500).json({ message: 'Error registering new user' });\n  }\n});\n\nrouter.post('/login', async (req, res) => {\n  try {\n    const { username, password } = req.body;\n    const user = await User.findOne({ username });\n    if (!user) {\n      return res.status(401).json({ message: 'Authentication failed. User not found.' });\n    }\n    user.comparePassword(password, (err, isMatch) => {\n      if (isMatch && !err) {\n        const token = generateToken(user);\n        res.json({ token });\n      } else {\n        res.status(401).json({ message: 'Authentication failed. Wrong password.' });\n      }\n    });\n  } catch (error) {\n    res.status(500).json({ message: 'Error logging in user' });\n  }\n});\n\nmodule.exports = router;\n"
+        }
+      },
+      {
+        "type": "code_change",
+        "code_change": {
+          "name": "authMiddleware.js",
+          "path": "/middlewares/authMiddleware.js",
+          "content": "const { verifyToken } = require('../utils/jwtUtils');\n\nconst authMiddleware = (req, res, next) => {\n  const token = req.headers.authorization?.split(' ')[1]; // Expecting \"Bearer TOKEN_STRING\"\n  const verifiedToken = verifyToken(token);\n  if (!verifiedToken) {\n    return res.status(401).json({ message: 'Unauthorized access' });\n  }\n  req.user = verifiedToken;\n  next();\n};\n\nmodule.exports = authMiddleware;\n"
+        }
+      },
+      {
+        "type": "code_change",
+        "code_change": {
+          "name": "index.js",
+          "path": "/index.js",
+          "content": "require('dotenv').config();\nconst express = require('express');\nconst mongoose = require('mongoose');\nconst bodyParser = require('body-parser');\nconst authRoutes = require('./routes/authRoutes');\nconst app = express();\nconst port = process.env.PORT || 3000;\n\nmongoose.connect('mongodb://localhost/ai_and_ml_', { useNewUrlParser: true, useUnifiedTopology: true });\n\napp.use(bodyParser.json());\napp.use('/api/auth', authRoutes);\n\napp.get('/ping', (req, res) => {\n  res.send('pong');\n});\n\napp.listen(port, () => {\n  console.log(`Server is running on port ${port}`);\n});\n"
+        }
+      },
+      {
+        "type": "command",
+        "command": {
+          "command": "mongod",
+          "timeout": 60000,
+          "success_message": "waiting for connections",
+          "command_id": "mongodb_runner"
+        }
+      },
+      {
+        "type": "command",
+        "command": {
+          "command": "node index.js",
+          "timeout": 10000,
+          "success_message": "Server is running on port"
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "endpoint": "OPENAI",
+  "model": "gpt-4-1106-preview",
+  "functions": [
+    {
+      "name": "get_fully_coded_file",
+      "description": "Gets the fully coded file.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "file_content": {
+            "type": "string",
+            "description": "Fully coded file. This contains only the lines of code and no other text."
+          }
+        },
+        "required": [
+          "file_content"
+        ]
+      }
+    }
+  ],
+  "response": {
+    "file_content": "const { applyFeedbackToStrategy } = require('../services/strategyService');\n\nexports.makeDecision = async (userId, baseStrategyConfig, marketData) => {\n  let strategyConfig = await applyFeedbackToStrategy(userId, baseStrategyConfig);\n  \n  // AI decision making process with the updated strategyConfig\n  // ...\n\n  // Determine the market trend\n  let trend;\n  if (marketData.someIndicator > threshold) {\n    trend = 'up';\n  } else if (marketData.someIndicator < threshold) {\n    trend = 'down';\n  } else {\n    trend = 'sideways';\n  }\n\n  // Implementing the strategy based on the market trend\n  let decision;\n  switch (trend) {\n    case 'up':\n      // Logic for uptrend strategy\n      decision = strategyConfig.uptrendDecision;\n      break;\n    case 'down':\n      // Logic for downtrend strategy\n      decision = strategyConfig.downtrendDecision;\n      break;\n    case 'sideways':\n      // Logic for sideways trend strategy\n      decision = strategyConfig.sidewaysDecision;\n      break;\n    default:\n      throw new Error('Unknown market trend');\n  }\n\n  return decision;\n};\n"
+  }
+}

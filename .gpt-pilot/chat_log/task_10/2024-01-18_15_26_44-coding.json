@@ -1,0 +1,153 @@
+{
+  "endpoint": "OPENAI",
+  "model": "gpt-4-1106-preview",
+  "functions": [
+    {
+      "name": "parse_development_task",
+      "description": "Breaks down the development task into smaller steps that need to be done to implement the entire task.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "tasks": {
+            "type": "array",
+            "description": "List of smaller development steps that need to be done to complete the entire task.",
+            "items": {
+              "type": "object",
+              "description": "A smaller development step that needs to be done to complete the entire task.  Remember, if you need to run a command that doesn't finish by itself (eg. a command to run an  If you need to create a directory that doesn't exist and is not the root project directory, always create it by running a command `mkdir`",
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "enum": [
+                    "command",
+                    "code_change",
+                    "human_intervention"
+                  ],
+                  "description": "Type of the development step that needs to be done to complete the entire task."
+                },
+                "command": {
+                  "type": "object",
+                  "description": "Command that needs to be run to complete the current task. This should be used only if the task is of a type \"command\".",
+                  "properties": {
+                    "command": {
+                      "type": "string",
+                      "description": "A single command that needs to be executed."
+                    },
+                    "timeout": {
+                      "type": "number",
+                      "description": "Timeout in milliseconds that represent the approximate time this command takes to finish. If you need to run a command that doesnt't finish by itself (eg. a command to run an app), set the timeout to to a value long enough to determine that it has started successfully and provide a command_id. If you need to create a directory that doesn't exist and is not the root project directory, always create it by running a command `mkdir`"
+                    },
+                    "success_message": {
+                      "type": "string",
+                      "description": "A message to look for in the output of the command to determine if successful or not."
+                    },
+                    "command_id": {
+                      "type": "string",
+                      "description": "If the process needs to continue running after the command is executed provide a unique command identifier which you can use to kill the process later."
+                    }
+                  },
+                  "required": [
+                    "command",
+                    "timeout"
+                  ]
+                },
+                "code_change": {
+                  "type": "object",
+                  "description": "A code change that needs to be implemented. This should be used only if the task is of a type \"code_change\".",
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "description": "Name of the file that needs to be implemented."
+                    },
+                    "path": {
+                      "type": "string",
+                      "description": "Full path of the file with the file name that needs to be implemented."
+                    },
+                    "content": {
+                      "type": "string",
+                      "description": "Full content of the file that needs to be implemented. **IMPORTANT**When you want to add a comment that tells the user to add the previous implementation at that place, make sure that the comment starts with `[OLD CODE]` and add a description of what old code should be inserted here. For example, `[OLD CODE] Login route`."
+                    }
+                  },
+                  "required": [
+                    "name",
+                    "path",
+                    "content"
+                  ]
+                },
+                "human_intervention_description": {
+                  "type": "string",
+                  "description": "Description of a step in debugging this issue when there is a human intervention needed. This should be used only if the task is of a type \"human_intervention\"."
+                }
+              },
+              "required": [
+                "type"
+              ]
+            }
+          }
+        },
+        "required": [
+          "tasks"
+        ]
+      }
+    }
+  ],
+  "response": {
+    "tasks": [
+      {
+        "type": "code_change",
+        "code_change": {
+          "name": "tradingOrchestrator.js",
+          "path": "/services/tradingOrchestrator.js",
+          "content": "const axios = require('axios');\nconst TradeController = require('../controllers/tradeController');\nconst tradingService = require('../services/tradingService');\nconst riskManagementService = require('../services/riskManagementService');\nconst grafService = require('../services/grafService');\nclass TradingOrchestrator {\n  constructor() {\n    this.tradeController = new TradeController();\n  }\n\n  async startDemoTrading(user) {\n    try {\n      const marketData = await tradingService.fetchDemoMarketData();\n      // TODO: Get user's strategy and apply user feedback\n\n      const riskParameters = await riskManagementService.calculateRiskParameters(marketData);\n      const decision = await this.tradeController.executeTrade(riskParameters);\n      await grafService.updateGraf(decision);\n\n      // [OLD CODE] Include other implementations here as required by previous tasks, such as training the AI model\n    } catch (error) {\n      console.error(`Error during demo trading: ${error.message}`);\n      // Handle error\n    }\n  }\n}\nmodule.exports = TradingOrchestrator;\n"
+        }
+      },
+      {
+        "type": "code_change",
+        "code_change": {
+          "name": "tradingOrchestratorRoutes.js",
+          "path": "/routes/tradingOrchestratorRoutes.js",
+          "content": "const express = require('express');\nconst TradingOrchestrator = require('../services/tradingOrchestrator');\nconst authMiddleware = require('../middlewares/authMiddleware');\nconst router = express.Router();\nconst tradingOrchestrator = new TradingOrchestrator();\nrouter.post('/start-demo-trading', authMiddleware, async (req, res) => {\n  try {\n    await tradingOrchestrator.startDemoTrading(req.user);\n    res.status(200).json({ message: 'Demo trading started successfully' });\n  } catch (error) {\n    res.status(500).json({ message: 'Demo trading could not be started.', error: error.message });\n  }\n});\nmodule.exports = router;\n"
+        }
+      },
+      {
+        "type": "code_change",
+        "code_change": {
+          "name": "index.js",
+          "path": "/index.js",
+          "content": "// [OLD CODE] Add other requires, previous app middleware and routes here\nconst tradingOrchestratorRoutes = require('./routes/tradingOrchestratorRoutes');\napp.use('/api/trading', tradingOrchestratorRoutes);\n// [OLD CODE] Add remaining Express app setup and middleware below.\n"
+        }
+      },
+      {
+        "type": "code_change",
+        "code_change": {
+          "name": "index.html",
+          "path": "/public/index.html",
+          "content": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <title>Graf Visualization</title>\n    <!-- [OLD CODE] Add previous head elements here -->\n</head>\n<body>\n    <!-- [OLD CODE] Add other body content here -->\n    <button id=\"start-demo-button\">Start Demo Trading</button>\n    <div id=\"graf-container\"></div>\n    <script src=\"/scripts/graf.js\"></script>\n    <script>\n      document.getElementById('start-demo-button').addEventListener('click', async () => {\n          const response = await fetch('/api/trading/start-demo-trading', { method: 'POST' });\n          const data = await response.json();\n          console.log(data); // Or update UI with a message\n      });\n    </script>\n</body>\n</html>\n"
+        }
+      },
+      {
+        "type": "code_change",
+        "code_change": {
+          "name": "homeRoutes.js",
+          "path": "/routes/homeRoutes.js",
+          "content": "const express = require('express');\nconst router = express.Router();\nconst path = require('path');\nrouter.get('/', (req, res) => {\n  res.sendFile(path.join(__dirname, '..', 'public', 'index.html'));\n});\nmodule.exports = router;\n"
+        }
+      },
+      {
+        "type": "code_change",
+        "code_change": {
+          "name": "index.js",
+          "path": "/index.js",
+          "content": "// [OLD CODE] Previous Express app setup including other requires and app middleware\nconst homeRoutes = require('./routes/homeRoutes');\napp.use(express.static('public'));\napp.use('/', homeRoutes);\n// [OLD CODE] Continue with the rest of the server setup code...\n"
+        }
+      },
+      {
+        "type": "command",
+        "command": {
+          "command": "npm start",
+          "timeout": 10000,
+          "success_message": "Server listening on port"
+        }
+      }
+    ]
+  }
+}

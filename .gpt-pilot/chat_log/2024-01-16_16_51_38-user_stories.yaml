@@ -1,0 +1,87 @@
+endpoint: OPENAI
+model: gpt-4-1106-preview
+messages:
+- role: system
+  content: You are an experienced project owner (project manager) who manages the entire process of creating software applications
+    for clients from the client specifications to the development. You act as if you are talking to the client who wants his
+    idea about a software application created by you and your team. You always think step by step and ask detailed questions
+    to completely understand what does the client want and then, you give those specifications to the development team who
+    creates the code for the app. Any instruction you get that is labeled as **IMPORTANT**, you follow strictly.
+- role: user
+  content: "I want you to create App (let's call it \"ai_and_ml_\") that can be described like this:\n```\nThe project will\
+    \ encompass the development of a software application, designated as \"ai_and_ml_\", designed to interface with MetaTrader\
+    \ 4 (MT4) and MetaTrader 5 (MT5) platforms via APIs, webhooks, or HTTP protocols. The application will perform analysis\
+    \ and execute trades automatically within the financial markets, supporting all trading instruments available on these\
+    \ platforms.\n\nKey features of \"ai_and_ml_\" will include:\n\n- A decision-making engine using artificial intelligence\
+    \ (AI) and machine learning (ML) to autonomously determine when to execute trades.\n- Customizable user-defined trading\
+    \ strategies, which once written and saved in normal language, allow the application to trade based on specific methods\
+    \ like martingale, averaging, high-frequency trading (HFT), or bespoke strategies.\n- A visual graphical representation\
+    \ (Graf) for tracking account growth, providing insights and advice for strategy improvement.\n- The capability to learn\
+    \ and evolve its decision-making process through the analysis of historical data, factoring in real-time market behaviors\
+    \ and user feedback.\n- An AI component that employs statistical analysis, machine learning models, and deep learning\
+    \ to analyze historical data, with a caution against overfitting and market evolution.\n- Processing of real-time market\
+    \ data through advanced algorithms to respond to live market changes, coupled with challenges related to data volatility.\n\
+    - A mechanism for user feedback incorporation, allowing personalization of the AI and adjustment of trading strategies\
+    \ and risk management rules.\n- A comprehensive integration of these elements for continuous learning and adaptation,\
+    \ using techniques such as online learning and reinforcement learning, while ensuring ethical and regulatory compliance.\n\
+    - Risk management features with AI and ML creating autonomous decisions on aspects such as stop-loss and take-profit parameters.\n\
+    - A secure user authentication system to control access to personal trading strategies and performance analytics.\n\n\
+    The AI and ML components will be developed to progressively enhance their decision-making capabilities while conforming\
+    \ to ethical standards and financial regulations. The system aims to balance customization, user experience, and financial\
+    \ efficacy, requiring continuous monitoring and adjustment for optimal performance.\n```\n\n\nHere are some additional\
+    \ questions and answers to clarify the App description:\n```\n\n    \n    Q: all \n    \n\n    \n    A: Should the app\
+    \ implement any specific risk management features, such as stop-loss or take-profit parameters?\n    \n\n    \n    Q:\
+    \ yes we have to devolpe it like it has to take his own disicion we have devolpe ai amd ml \n    \n\n    \n    A: What\
+    \ level of customization will be required for users to define their own trading strategies within the app?\n    \n\n \
+    \   \n    Q: give a opation to make costimaze \n    \n\n    \n    A: Will the app require a user authentication system\
+    \ to manage access to personal trading strategies and performance data?\n    \n\n    \n    Q: yes \n    \n\n    \n   \
+    \ A: How should the app's AI component learn and improve its trading decisions over time? Through historical data analysis,\
+    \ real-time market data, user feedback, or a combination of these?\n    \n\n    \n    Q: Historical Data Analysis:\n\n\
+    Importance: Historical data provides a wealth of information about market behavior under different conditions. By analyzing\
+    \ past price movements, economic indicators, and other relevant financial data, the AI can identify patterns, trends,\
+    \ and correlations that are crucial for making informed trading decisions.\nMethods: Techniques like statistical analysis,\
+    \ machine learning models (e.g., regression, classification, time series forecasting), and deep learning (e.g., neural\
+    \ networks) can be employed to understand historical data.\nChallenges: Over-reliance on historical data can lead to issues\
+    \ like overfitting, where the model performs well on past data but poorly on new, unseen data. Markets also evolve, and\
+    \ past patterns may not always predict future movements.\nReal-Time Market Data:\n\nImportance: Financial markets are\
+    \ dynamic and influenced by a myriad of factors, including geopolitical events, economic reports, and market sentiment.\
+    \ Real-time data allows the AI to respond promptly to current market conditions.\nMethods: The AI should incorporate algorithms\
+    \ capable of processing and analyzing real-time data streams. This might include high-frequency trading algorithms, news\
+    \ sentiment analysis, and anomaly detection.\nChallenges: Real-time data can be noisy and volatile. The AI needs to distinguish\
+    \ between short-term fluctuations and significant trends.\nUser Feedback:\n\nImportance: User feedback helps tailor the\
+    \ AI to individual preferences and improve user experience. Different traders have different risk tolerances, trading\
+    \ styles, and goals.\nMethods: Incorporate mechanisms for users to provide feedback on the AI's performance and suggestions.\
+    \ Use this feedback to adjust the AI's trading strategies, risk management rules, and even user interface.\nChallenges:\
+    \ User feedback can be subjective and may not always align with optimal trading strategies. Balancing user preferences\
+    \ with sound financial principles is key.\nCombination and Integration:\n\nSynergy: The most effective approach is to\
+    \ integrate these methods. Historical data provides a foundational understanding, real-time data offers immediacy, and\
+    \ user feedback ensures personalization and adaptability.\nImplementation: Develop a system where these components feed\
+    \ into each other. For example, real-time market reactions can be used to refine historical models, while user feedback\
+    \ can help prioritize which real-time data is most relevant.\nContinuous Learning and Adaptation:\n\nMachine Learning\
+    \ Techniques: Use online learning, reinforcement learning, or adaptive algorithms that can update their parameters in\
+    \ response to new data and feedback.\nMonitoring and Maintenance: Regularly monitor the AI's performance and intervene\
+    \ when necessary to adjust models, especially in response to market regime changes or unusual events.\nEthical and Regulatory\
+    \ Considerations:\n\nEnsure that the AI's learning and decision-making processes are transparent, fair, and compliant\
+    \ with financial regulations. This includes considerations around data privacy, market manipulation, and ensuring that\
+    \ the AI does not engage in unethical trading practices.\n    \n\n```\n\n\nThink step by step about the description for\
+    \ the App \"ai_and_ml_\" and the additional questions and answers and break down user stories. You will think about the\
+    \ App description and the answers listed and create a list of all user stories. A user story is a description of how a\
+    \ user can interact with the App. For example, if an app's description is `Create a script that finds Youtube channels\
+    \ with the word \"test\" inside the channel name`, user stories could be:\n- `user will run the script from the CLI`\n\
+    - `user will get the list of all channels in a CSV file`\n\n**IMPORTANT**\nReturn one user story at the time. Do not return\
+    \ anything else but single user story. I might ask you to modify some user stories and only when I send you empty response\
+    \ you can move to next user story.\n\n**IMPORTANT**\nOnce you are done creating all user stories, write the response containing\
+    \ nothing else but this:\nEVERYTHING_CLEAR"
+- role: assistant
+  content: User will authenticate through a secure login system to access personal trading strategies and performance analytics.
+- role: user
+  content: 'make sure it has to work above 80% accurecy all the types of methods like nural network and adavanced tech it
+    has tp read online news also like it has to trade like man daily to has to take update what we have the news is there
+    it has work as much as better it has imporve its knowledge like infinity '
+- role: assistant
+  content: User will receive trade execution with above 80% accuracy through the application's use of neural networks and
+    advanced technologies.
+- role: user
+  content: ''
+response: User will have the application analyze online news sources to inform trading decisions and update the AI with relevant
+  information daily.

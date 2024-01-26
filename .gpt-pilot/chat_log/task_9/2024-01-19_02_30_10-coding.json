@@ -1,0 +1,111 @@
+{
+  "endpoint": "OPENAI",
+  "model": "gpt-4-1106-preview",
+  "functions": [
+    {
+      "name": "start_debugging",
+      "description": "Starts the debugging process based on the list of steps that need to be done to debug the problem.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "thoughts": {
+            "type": "string",
+            "description": "Thoughts that you have about the problem that you are trying to debug."
+          },
+          "reasoning": {
+            "type": "string"
+          },
+          "steps": {
+            "type": "array",
+            "description": "List of steps that need to be done to debug the problem.",
+            "items": {
+              "type": "object",
+              "description": "A single step that needs to be done to get closer to debugging this issue.  Remember, if you need to run a command that doesn't finish by itself (eg. a command to run an app), put the timeout to 3000 milliseconds. If you need to create a directory that doesn't exist and is not the root project directory, always create it by running a command `mkdir`",
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "enum": [
+                    "command",
+                    "code_change",
+                    "human_intervention"
+                  ],
+                  "description": "Type of the step that needs to be done to debug this issue."
+                },
+                "command": {
+                  "type": "object",
+                  "description": "Command that needs to be run to complete the current task. This should be used only if the task is of a type \"command\".",
+                  "properties": {
+                    "command": {
+                      "type": "string",
+                      "description": "Command that needs to be run to debug this issue."
+                    },
+                    "timeout": {
+                      "type": "number",
+                      "description": "Timeout in milliseconds that represent the approximate time this command takes to finish. If you need to run a command that doesn't finish by itself (eg. a command to run an app), put the timeout to 3000 milliseconds."
+                    },
+                    "success_message": {
+                      "type": "string",
+                      "description": "A message to look for in the output of the command to determine if successful or not."
+                    },
+                    "command_id": {
+                      "type": "string",
+                      "description": "If the process needs to continue running after the command is executed provide a unique command identifier which you can use to kill the process later."
+                    }
+                  },
+                  "required": [
+                    "command",
+                    "timeout"
+                  ]
+                },
+                "code_change_description": {
+                  "type": "string",
+                  "description": "Description of a step in debugging this issue when there are code changes required. This should be used only if the task is of a type \"code_change\" and it should thoroughly describe what needs to be done to implement the code change for a single file - it cannot include changes for multiple files."
+                },
+                "human_intervention_description": {
+                  "type": "string",
+                  "description": "Description of a step in debugging this issue when there is a human intervention needed. This should be used only if the task is of a type \"human_intervention\"."
+                },
+                "need_to_see_output": {
+                  "type": "boolean",
+                  "description": "Set to `true` if the definition of subsequent steps may need to change after you see the output of a successful execution of this step. For example, if the purpose of a command is to check the status of a service or contents of a file before deciding how to proceed then this flag should be set to `true`. If subsequent steps can be executed as long as this step is successful, then this flag does not need to be set."
+                },
+                "check_if_fixed": {
+                  "type": "boolean",
+                  "description": "Flag that indicates if the original command that triggered the error that's being debugged should be tried after this step to check if the error is fixed. If you think that the original command `delete node_modules/ && delete package-lock.json` will pass after this step, then this flag should be set to TRUE and if you think that the original command will still fail after this step, then this flag should be set to `false`."
+                }
+              },
+              "required": [
+                "type",
+                "check_if_fixed"
+              ]
+            }
+          }
+        },
+        "required": [
+          "thoughts",
+          "reasoning",
+          "steps"
+        ]
+      }
+    }
+  ],
+  "response": {
+    "thoughts": "The error 'Unexpected identifier' suggests that there is likely a syntax issue in the tradingOrchestrator.js file, which is preventing the file from executing. Since 'await' is used outside of an async function, it is causing a syntax error. The 'await' keyword can only be used inside an asynchronous function.",
+    "reasoning": "To resolve the syntax error, ensure that 'await' is only used within an async function. In the context of a class, if 'await' is used in a method, that method must be declared with 'async'. After making the necessary code changes, running node with the --trace-warnings flag should not display the previous error, indicating that the issue has been resolved.",
+    "steps": [
+      {
+        "type": "code_change",
+        "code_change_description": "In the file /services/tradingOrchestrator.js we need to ensure that all functions that use 'await' are marked as 'async'. For example, change 'startDemoTrading(user)' and any other functions using 'await' to 'async startDemoTrading(user)'.",
+        "check_if_fixed": false
+      },
+      {
+        "type": "command",
+        "command": {
+          "command": "node --trace-warnings ./services/tradingOrchestrator.js",
+          "timeout": 3000
+        },
+        "check_if_fixed": true
+      }
+    ]
+  }
+}

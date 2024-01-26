@@ -1,0 +1,152 @@
+{
+  "endpoint": "OPENAI",
+  "model": "gpt-4-1106-preview",
+  "functions": [
+    {
+      "name": "parse_development_task",
+      "description": "Breaks down the development task into smaller steps that need to be done to implement the entire task.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "tasks": {
+            "type": "array",
+            "description": "List of smaller development steps that need to be done to complete the entire task.",
+            "items": {
+              "type": "object",
+              "description": "A smaller development step that needs to be done to complete the entire task.  Remember, if you need to run a command that doesn't finish by itself (eg. a command to run an  If you need to create a directory that doesn't exist and is not the root project directory, always create it by running a command `mkdir`",
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "enum": [
+                    "command",
+                    "code_change",
+                    "human_intervention"
+                  ],
+                  "description": "Type of the development step that needs to be done to complete the entire task."
+                },
+                "command": {
+                  "type": "object",
+                  "description": "Command that needs to be run to complete the current task. This should be used only if the task is of a type \"command\".",
+                  "properties": {
+                    "command": {
+                      "type": "string",
+                      "description": "A single command that needs to be executed."
+                    },
+                    "timeout": {
+                      "type": "number",
+                      "description": "Timeout in milliseconds that represent the approximate time this command takes to finish. If you need to run a command that doesnt't finish by itself (eg. a command to run an app), set the timeout to to a value long enough to determine that it has started successfully and provide a command_id. If you need to create a directory that doesn't exist and is not the root project directory, always create it by running a command `mkdir`"
+                    },
+                    "success_message": {
+                      "type": "string",
+                      "description": "A message to look for in the output of the command to determine if successful or not."
+                    },
+                    "command_id": {
+                      "type": "string",
+                      "description": "If the process needs to continue running after the command is executed provide a unique command identifier which you can use to kill the process later."
+                    }
+                  },
+                  "required": [
+                    "command",
+                    "timeout"
+                  ]
+                },
+                "code_change": {
+                  "type": "object",
+                  "description": "A code change that needs to be implemented. This should be used only if the task is of a type \"code_change\".",
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "description": "Name of the file that needs to be implemented."
+                    },
+                    "path": {
+                      "type": "string",
+                      "description": "Full path of the file with the file name that needs to be implemented."
+                    },
+                    "content": {
+                      "type": "string",
+                      "description": "Full content of the file that needs to be implemented. **IMPORTANT**When you want to add a comment that tells the user to add the previous implementation at that place, make sure that the comment starts with `[OLD CODE]` and add a description of what old code should be inserted here. For example, `[OLD CODE] Login route`."
+                    }
+                  },
+                  "required": [
+                    "name",
+                    "path",
+                    "content"
+                  ]
+                },
+                "human_intervention_description": {
+                  "type": "string",
+                  "description": "Description of a step in debugging this issue when there is a human intervention needed. This should be used only if the task is of a type \"human_intervention\"."
+                }
+              },
+              "required": [
+                "type"
+              ]
+            }
+          }
+        },
+        "required": [
+          "tasks"
+        ]
+      }
+    }
+  ],
+  "response": {
+    "tasks": [
+      {
+        "type": "code_change",
+        "code_change": {
+          "name": "riskManagementService.js",
+          "path": "/services/riskManagementService.js",
+          "content": "class RiskManagementService {\n  constructor(model) {\n    this.model = model;\n  }\n\n  async calculateRiskParameters(marketData) {\n    const riskParameters = await this.model.predict(marketData);\n    const stopLossLevel = riskParameters.stopLoss;\n    const takeProfitLevel = riskParameters.takeProfit;\n    return {\n      stopLoss: stopLossLevel,\n      takeProfit: takeProfitLevel\n    };\n  }\n}\n\nmodule.exports = RiskManagementService;"
+        }
+      },
+      {
+        "type": "code_change",
+        "code_change": {
+          "name": "riskPredictionModel.js",
+          "path": "/ai/riskPredictionModel.js",
+          "content": "class RiskPredictionModel {\n  async predict(marketData) {\n    // INPUT_REQUIRED {Implement actual prediction logic here}\n    return {\n      stopLoss: Math.random(),\n      takeProfit: Math.random()\n    };\n  }\n}\n\nmodule.exports = RiskPredictionModel;"
+        }
+      },
+      {
+        "type": "code_change",
+        "code_change": {
+          "name": "metaApiConnection.js",
+          "path": "/utils/metaApiConnection.js",
+          "content": "const MetaApi = require('metaapi.cloud-sdk').default;\n\nclass MetaApiConnection {\n  // [OLD CODE] Existing methods\n\n  async applyRiskParameters(account, tradeId, stopLoss, takeProfit) {\n    try {\n      let modifyTradePayload = {\n        type: 'POSITION_MODIFY',\n        positionId: tradeId,\n        stopLoss: stopLoss,\n        takeProfit: takeProfit\n      };\n      await account.modifyPosition(tradeId, modifyTradePayload);\n      console.log(`Modified trade ${tradeId} with stopLoss: ${stopLoss}, takeProfit: ${takeProfit}`);\n    } catch (error) {\n      console.error(`Error applying risk parameters to MetaTrader: ${error.message}`);\n      throw error;\n    }\n  }\n}\n\nmodule.exports = MetaApiConnection;"
+        }
+      },
+      {
+        "type": "code_change",
+        "code_change": {
+          "name": "logger.js",
+          "path": "/utils/logger.js",
+          "content": "const winston = require('winston');\n\nconst logger = winston.createLogger({\n  level: 'info',\n  format: winston.format.json(),\n  transports: [\n    new winston.transports.File({ filename: 'combined.log' }),\n    // new winston.transports.Console({ format: winston.format.simple() }),\n  ],\n});\n\nmodule.exports = logger;"
+        }
+      },
+      {
+        "type": "code_change",
+        "code_change": {
+          "name": "tradeController.js",
+          "path": "/controllers/tradeController.js",
+          "content": "const MetaApiConnection = require('../utils/metaApiConnection');\nconst RiskManagementService = require('../services/riskManagementService');\nconst RiskPredictionModel = require('../ai/riskPredictionModel');\nconst logger = require('../utils/logger');\n\nclass TradeController {\n  constructor() {\n    const metaApiKey = process.env.META_API_KEY; // INPUT_REQUIRED {Store your MetaApi key here}\n    const accountId = process.env.META_API_ACCOUNT_ID; // INPUT_REQUIRED {Store your MetaApi account ID here}\n    this.metaApiConnection = new MetaApiConnection(metaApiKey, accountId);\n    this.riskManagementService = new RiskManagementService(new RiskPredictionModel());\n  }\n\n  async executeTrade(marketData, tradeId) {\n    try {\n      const { stopLoss, takeProfit } = await this.riskManagementService.calculateRiskParameters(marketData);\n      await this.metaApiConnection.applyRiskParameters(tradeId, stopLoss, takeProfit);\n      logger.info(`Trade executed with stopLoss: ${stopLoss}, takeProfit: ${takeProfit}`);\n      // [OLD CODE] Remaining trade execution logic\n    } catch (error) {\n      logger.error(`Trade execution failure: ${error.message}`);\n      throw error;\n    }\n  }\n}\n\nmodule.exports = TradeController;"
+        }
+      },
+      {
+        "type": "command",
+        "command": {
+          "command": "npm install winston",
+          "timeout": 60000
+        }
+      },
+      {
+        "type": "command",
+        "command": {
+          "command": "npm start",
+          "timeout": 10000,
+          "success_message": "Server is running"
+        }
+      }
+    ]
+  }
+}

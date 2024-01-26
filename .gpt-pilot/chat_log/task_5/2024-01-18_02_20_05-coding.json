@@ -1,0 +1,128 @@
+{
+  "endpoint": "OPENAI",
+  "model": "gpt-4-1106-preview",
+  "functions": [
+    {
+      "name": "parse_development_task",
+      "description": "Breaks down the development task into smaller steps that need to be done to implement the entire task.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "tasks": {
+            "type": "array",
+            "description": "List of smaller development steps that need to be done to complete the entire task.",
+            "items": {
+              "type": "object",
+              "description": "A smaller development step that needs to be done to complete the entire task.  Remember, if you need to run a command that doesn't finish by itself (eg. a command to run an  If you need to create a directory that doesn't exist and is not the root project directory, always create it by running a command `mkdir`",
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "enum": [
+                    "command",
+                    "code_change",
+                    "human_intervention"
+                  ],
+                  "description": "Type of the development step that needs to be done to complete the entire task."
+                },
+                "command": {
+                  "type": "object",
+                  "description": "Command that needs to be run to complete the current task. This should be used only if the task is of a type \"command\".",
+                  "properties": {
+                    "command": {
+                      "type": "string",
+                      "description": "A single command that needs to be executed."
+                    },
+                    "timeout": {
+                      "type": "number",
+                      "description": "Timeout in milliseconds that represent the approximate time this command takes to finish. If you need to run a command that doesnt't finish by itself (eg. a command to run an app), set the timeout to to a value long enough to determine that it has started successfully and provide a command_id. If you need to create a directory that doesn't exist and is not the root project directory, always create it by running a command `mkdir`"
+                    },
+                    "success_message": {
+                      "type": "string",
+                      "description": "A message to look for in the output of the command to determine if successful or not."
+                    },
+                    "command_id": {
+                      "type": "string",
+                      "description": "If the process needs to continue running after the command is executed provide a unique command identifier which you can use to kill the process later."
+                    }
+                  },
+                  "required": [
+                    "command",
+                    "timeout"
+                  ]
+                },
+                "code_change": {
+                  "type": "object",
+                  "description": "A code change that needs to be implemented. This should be used only if the task is of a type \"code_change\".",
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "description": "Name of the file that needs to be implemented."
+                    },
+                    "path": {
+                      "type": "string",
+                      "description": "Full path of the file with the file name that needs to be implemented."
+                    },
+                    "content": {
+                      "type": "string",
+                      "description": "Full content of the file that needs to be implemented. **IMPORTANT**When you want to add a comment that tells the user to add the previous implementation at that place, make sure that the comment starts with `[OLD CODE]` and add a description of what old code should be inserted here. For example, `[OLD CODE] Login route`."
+                    }
+                  },
+                  "required": [
+                    "name",
+                    "path",
+                    "content"
+                  ]
+                },
+                "human_intervention_description": {
+                  "type": "string",
+                  "description": "Description of a step in debugging this issue when there is a human intervention needed. This should be used only if the task is of a type \"human_intervention\"."
+                }
+              },
+              "required": [
+                "type"
+              ]
+            }
+          }
+        },
+        "required": [
+          "tasks"
+        ]
+      }
+    }
+  ],
+  "response": {
+    "tasks": [
+      {
+        "type": "command",
+        "command": {
+          "command": "npm install @tensorflow/tfjs @tensorflow/tfjs-node",
+          "timeout": 120000
+        }
+      },
+      {
+        "type": "code_change",
+        "code_change": {
+          "name": "metaApiClient.js",
+          "path": "utils/metaApiClient.js",
+          "content": "const { MetaApi } = require('metaapi.cloud-sdk');\n\nclass MetaApiClient {\n  constructor(metaApiKey) {\n    if (!metaApiKey) {\n      throw new Error('MetaApi key is missing.');\n    }\n    this.api = new MetaApi(metaApiKey);\n  }\n\n  async connectToAccount(accountId) {\n    try {\n      const account = await this.api.metatraderAccountApi.getAccount(accountId);\n      const connection = await account.connect();\n      console.log(`Connected to MetaTrader account, connection id is ${connection.id}.`);\n      return connection;\n    } catch (error) {\n      console.error(`Error during MetaApi connection: ${error.message}`);\n      throw error;\n    }\n  }\n\n  async getMarketData(accountId, symbol, timeframe, startTime, endTime) {\n    const connection = await this.connectToAccount(accountId);\n    // Fetch the market data from MetaApi\n    return await connection.getHistoricalMarketData(symbol, timeframe, startTime, endTime);\n  }\n}\n\nmodule.exports = {\n  MetaApiClient,\n};\n"
+        }
+      },
+      {
+        "type": "code_change",
+        "code_change": {
+          "name": "dataProcessor.js",
+          "path": "ai/dataProcessor.js",
+          "content": "const { MetaApiClient } = require('../utils/metaApiClient');\nconst dataPreprocessor = require('./dataPreprocessor');\n\nclass DataProcessor {\n  constructor(metaApiConnection) {\n    this.connection = metaApiConnection;\n  }\n\n  // Fetch real-time market data with given parameters and preprocess it\n  async fetchAndPrepareData(accountId, symbol, timeframe, startTime, endTime) {\n    const marketData = await this.connection.getMarketData(accountId, symbol, timeframe, startTime, endTime);\n    const preparedData = dataPreprocessor.prepareTrainingData(marketData);\n    return preparedData;\n  }\n}\n\nmodule.exports = {\n  DataProcessor,\n};\n"
+        }
+      },
+      {
+        "type": "code_change",
+        "code_change": {
+          "name": "dataPreprocessor.js",
+          "path": "ai/dataPreprocessor.js",
+          "content": "const tf = require('@tensorflow/tfjs');\n\n// Function to format historical market data for training\nconst prepareTrainingData = (marketData) => {\n  // Logic to preprocess data goes here. This should include feature selection,\n  // normalization, and creation of labels for supervised learning.\n  // This is a placeholder; the actual implementation will depend on the details of the marketData.\n  \n  // Convert marketData to features (e.g., open, high, low, close prices)\n  // Normalize features if necessary\n  // Create labels for supervised learning if necessary\n  \n  const xs = tf.tensor2d(marketData.map(data => [\n    // Assuming 'data' is an object with numeric properties for open, high, low, close prices.\n    // Add other relevant properties as needed.\n    data.open, // INPUT_REQUIRED {The logic for extracting the 'open' price from the data}\n    data.high, // INPUT_REQUIRED {The logic for extracting the 'high' price from the data}\n    data.low, // INPUT_REQUIRED {The logic for extracting the 'low' price from the data}\n    data.close // INPUT_REQUIRED {The logic for extracting the 'close' price from the data}\n  ]));\n  \n  // Placeholder for labels (ys), should be created based on marketData\n  const ys = tf.tensor1d(marketData.map(data => {\n    // Logic to create label based on data (e.g., 0 for no action, 1 for buy, 2 for sell)\n    return 0; // INPUT_REQUIRED {The logic for determining the labels based on the market data}\n  }));\n\n  return { xs, ys };\n};\n\nmodule.exports = {\n  prepareTrainingData,\n};\n"
+        }
+      }
+    ]
+  }
+}

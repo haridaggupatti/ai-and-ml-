@@ -1,0 +1,8 @@
+#graf-container {
+  width: 90%;
+  height: 500px; /* Adjust the height as needed */
+  margin: auto;
+  position: relative;
+}
+
+/* Additional styling as required */

@@ -1,0 +1,113 @@
+{
+  "endpoint": "OPENAI",
+  "model": "gpt-4-1106-preview",
+  "functions": [
+    {
+      "name": "start_debugging",
+      "description": "Starts the debugging process based on the list of steps that need to be done to debug the problem.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "thoughts": {
+            "type": "string",
+            "description": "Thoughts that you have about the problem that you are trying to debug."
+          },
+          "reasoning": {
+            "type": "string"
+          },
+          "steps": {
+            "type": "array",
+            "description": "List of steps that need to be done to debug the problem.",
+            "items": {
+              "type": "object",
+              "description": "A single step that needs to be done to get closer to debugging this issue.  Remember, if you need to run a command that doesn't finish by itself (eg. a command to run an app), put the timeout to 3000 milliseconds. If you need to create a directory that doesn't exist and is not the root project directory, always create it by running a command `mkdir`",
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "enum": [
+                    "command",
+                    "code_change",
+                    "human_intervention"
+                  ],
+                  "description": "Type of the step that needs to be done to debug this issue."
+                },
+                "command": {
+                  "type": "object",
+                  "description": "Command that needs to be run to complete the current task. This should be used only if the task is of a type \"command\".",
+                  "properties": {
+                    "command": {
+                      "type": "string",
+                      "description": "Command that needs to be run to debug this issue."
+                    },
+                    "timeout": {
+                      "type": "number",
+                      "description": "Timeout in milliseconds that represent the approximate time this command takes to finish. If you need to run a command that doesn't finish by itself (eg. a command to run an app), put the timeout to 3000 milliseconds."
+                    },
+                    "success_message": {
+                      "type": "string",
+                      "description": "A message to look for in the output of the command to determine if successful or not."
+                    },
+                    "command_id": {
+                      "type": "string",
+                      "description": "If the process needs to continue running after the command is executed provide a unique command identifier which you can use to kill the process later."
+                    }
+                  },
+                  "required": [
+                    "command",
+                    "timeout"
+                  ]
+                },
+                "code_change_description": {
+                  "type": "string",
+                  "description": "Description of a step in debugging this issue when there are code changes required. This should be used only if the task is of a type \"code_change\" and it should thoroughly describe what needs to be done to implement the code change for a single file - it cannot include changes for multiple files."
+                },
+                "human_intervention_description": {
+                  "type": "string",
+                  "description": "Description of a step in debugging this issue when there is a human intervention needed. This should be used only if the task is of a type \"human_intervention\"."
+                },
+                "need_to_see_output": {
+                  "type": "boolean",
+                  "description": "Set to `true` if the definition of subsequent steps may need to change after you see the output of a successful execution of this step. For example, if the purpose of a command is to check the status of a service or contents of a file before deciding how to proceed then this flag should be set to `true`. If subsequent steps can be executed as long as this step is successful, then this flag does not need to be set."
+                },
+                "check_if_fixed": {
+                  "type": "boolean",
+                  "description": "Flag that indicates if the original command that triggered the error that's being debugged should be tried after this step to check if the error is fixed. If you think that the original command `delete node_modules/ && delete package-lock.json` will pass after this step, then this flag should be set to TRUE and if you think that the original command will still fail after this step, then this flag should be set to `false`."
+                }
+              },
+              "required": [
+                "type",
+                "check_if_fixed"
+              ]
+            }
+          }
+        },
+        "required": [
+          "thoughts",
+          "reasoning",
+          "steps"
+        ]
+      }
+    }
+  ],
+  "response": {
+    "thoughts": "The error message 'Cannot GET /api/auth/register'%20/' suggests that there might be an issue with the route handling in the Express server. It seems like an encoded space '%20' and a trailing slash '/' are being included at the end of the expected route which could be causing the issue. This might be due to a typo in the URL used for the request, or it may be an issue in the routing setup in the Express app. Additionally, we should ensure that the /api/auth/register route is properly defined and accessible.",
+    "reasoning": "To debug this issue, we need to check if there are any typos in the request URL. If the request URL is correct, we need to verify the route handling in authRoutes.js and ensure that the Express server routes are correctly set up to handle this path. Checking the actual route definition, as well as any potential middleware that might be affecting the routing, is essential.",
+    "steps": [
+      {
+        "type": "code_change",
+        "code_change_description": "In 'routes/authRoutes.js', ensure that the route for '/register' is properly defined without any trailing spaces or slashes. Look for any typos in the route path and correct them if necessary. Also, make sure there is no middleware that could be altering the request path unintentionally.",
+        "check_if_fixed": false
+      },
+      {
+        "type": "command",
+        "command": {
+          "command": "curl -X POST http://localhost:3000/api/auth/register -H 'Content-Type: application/json' -d '{\"username\": \"testuser\", \"password\": \"testpass\"}'",
+          "timeout": 3000,
+          "success_message": "token"
+        },
+        "need_to_see_output": true,
+        "check_if_fixed": true
+      }
+    ]
+  }
+}

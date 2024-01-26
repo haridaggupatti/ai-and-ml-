@@ -1,0 +1,135 @@
+endpoint: OPENAI
+model: gpt-4-1106-preview
+messages:
+- role: system
+  content: You are an experienced software architect. Your expertise is in creating an architecture for an MVP (minimum viable
+    products) for Apps that can be developed as fast as possible by using as many ready-made technologies as possible.
+- role: user
+  content: 'You are working in a software development agency and a project manager approached you telling you that you''re
+    assigned to work on a new project. You  are working on a App called "ai_and_ml_" and you need to create specifications
+    on what technologies should be used in this project.
+
+
+    Here is a high level description of "ai_and_ml_":
+
+    ```
+
+    The project will encompass the development of a software application, designated as "ai_and_ml_", designed to interface
+    with MetaTrader 4 (MT4) and MetaTrader 5 (MT5) platforms via APIs, webhooks, or HTTP protocols. The application will perform
+    analysis and execute trades automatically within the financial markets, supporting all trading instruments available on
+    these platforms.
+
+
+    Key features of "ai_and_ml_" will include:
+
+
+    - A decision-making engine using artificial intelligence (AI) and machine learning (ML) to autonomously determine when
+    to execute trades.
+
+    - Customizable user-defined trading strategies, which once written and saved in normal language, allow the application
+    to trade based on specific methods like martingale, averaging, high-frequency trading (HFT), or bespoke strategies.
+
+    - A visual graphical representation (Graf) for tracking account growth, providing insights and advice for strategy improvement.
+
+    - The capability to learn and evolve its decision-making process through the analysis of historical data, factoring in
+    real-time market behaviors and user feedback.
+
+    - An AI component that employs statistical analysis, machine learning models, and deep learning to analyze historical
+    data, with a caution against overfitting and market evolution.
+
+    - Processing of real-time market data through advanced algorithms to respond to live market changes, coupled with challenges
+    related to data volatility.
+
+    - A mechanism for user feedback incorporation, allowing personalization of the AI and adjustment of trading strategies
+    and risk management rules.
+
+    - A comprehensive integration of these elements for continuous learning and adaptation, using techniques such as online
+    learning and reinforcement learning, while ensuring ethical and regulatory compliance.
+
+    - Risk management features with AI and ML creating autonomous decisions on aspects such as stop-loss and take-profit parameters.
+
+    - A secure user authentication system to control access to personal trading strategies and performance analytics.
+
+
+    The AI and ML components will be developed to progressively enhance their decision-making capabilities while conforming
+    to ethical standards and financial regulations. The system aims to balance customization, user experience, and financial
+    efficacy, requiring continuous monitoring and adjustment for optimal performance.
+
+    ```
+
+
+
+    Here are user stories that specify how users use "ai_and_ml_":
+
+    ```
+
+
+    - User will receive trade execution with above 80% accuracy through the application''s use of neural networks and advanced
+    technologies.
+
+
+    - User will have the application analyze online news sources to inform trading decisions and update the AI with relevant
+    information daily.
+
+
+    ```
+
+
+
+
+    Now, based on the projects details, think step by step and list the names of the technologies that will be used by your
+    development team to create the app "ai_and_ml_".
+
+    Do not give any subjective thoughts or options, give exact technologies, for example:
+
+    Instead of ["D3.js or other suitable charting library", "axios or other http client library"] answer with ["D3.js", "axios"].
+
+
+    You do not need to list any technologies related to automated tests (like Jest, Cypress, Mocha, Selenium, etc) or  any
+    technologies related to deployment (like Heroku).
+
+
+    **Project Technology Guidelines**
+
+    Relevance: Only include technologies that are essential and will be actively used in the project. Avoid mentioning any
+    technologies that are not required. For example, don''t suggest MongoDB if database is not needed for project.
+
+    Compatibility: Ensure that the listed technologies are compatible with each other. Exclude any technologies that cannot
+    be integrated or used in conjunction with others. For example, Pandas (Python library) and Node.js can''t be used together.
+    Another example is MongoDB (NoSQL database) and MySQL (SQL database) shouldn''t be used together unless that is specified
+    in project description.
+
+    Technology Preferences: In scenarios where multiple technology options are available for a specific project component,
+    prioritize the following preferred technologies:
+
+    - Node.js,
+
+    - MongoDB,
+
+    - PeeWee,
+
+    - Bootstrap,
+
+    - HTML,
+
+    - CSS3,
+
+    - cronjob,
+
+    - Socket.io
+
+
+    **IMPORTANT**
+
+    Do not use, create or suggest any microservices. Create strictly monolithic application even if in some prompts I might
+    suggest microservices might be better or more desired solution. Do your best to find a solution to any requirement without
+    using microservices.'
+- role: user
+  content: "**IMPORTANT**\nYou must respond with ONLY the JSON object, with NO additional text or explanation.\n\nHere is\
+    \ the schema for the expected JSON object:\n```json\n{\n    \"technologies\": {\n        \"type\": \"array\",\n      \
+    \  \"description\": \"List of technologies.\",\n        \"items\": {\n            \"type\": \"string\",\n            \"\
+    description\": \"technology\"\n        }\n    }\n}\n```\n\n"
+response: "{\n    \"error\": {\n        \"message\": \"You exceeded your current quota, please check your plan and billing\
+  \ details. For more information on this error, read the docs: https://platform.openai.com/docs/guides/error-codes/api-errors.\"\
+  ,\n        \"type\": \"insufficient_quota\",\n        \"param\": null,\n        \"code\": \"insufficient_quota\"\n    }\n\
+  }\n"

@@ -1,0 +1,115 @@
+name: ai_and_ml_
+description: 'The project will encompass the development of a software application, designated as "ai_and_ml_", designed to
+  interface with MetaTrader 4 (MT4) and MetaTrader 5 (MT5) platforms via APIs, webhooks, or HTTP protocols. The application
+  will perform analysis and execute trades automatically within the financial markets, supporting all trading instruments
+  available on these platforms.
+
+
+  Key features of "ai_and_ml_" will include:
+
+
+  - A decision-making engine using artificial intelligence (AI) and machine learning (ML) to autonomously determine when to
+  execute trades.
+
+  - Customizable user-defined trading strategies, which once written and saved in normal language, allow the application to
+  trade based on specific methods like martingale, averaging, high-frequency trading (HFT), or bespoke strategies.
+
+  - A visual graphical representation (Graf) for tracking account growth, providing insights and advice for strategy improvement.
+
+  - The capability to learn and evolve its decision-making process through the analysis of historical data, factoring in real-time
+  market behaviors and user feedback.
+
+  - An AI component that employs statistical analysis, machine learning models, and deep learning to analyze historical data,
+  with a caution against overfitting and market evolution.
+
+  - Processing of real-time market data through advanced algorithms to respond to live market changes, coupled with challenges
+  related to data volatility.
+
+  - A mechanism for user feedback incorporation, allowing personalization of the AI and adjustment of trading strategies and
+  risk management rules.
+
+  - A comprehensive integration of these elements for continuous learning and adaptation, using techniques such as online
+  learning and reinforcement learning, while ensuring ethical and regulatory compliance.
+
+  - Risk management features with AI and ML creating autonomous decisions on aspects such as stop-loss and take-profit parameters.
+
+  - A secure user authentication system to control access to personal trading strategies and performance analytics.
+
+
+  The AI and ML components will be developed to progressively enhance their decision-making capabilities while conforming
+  to ethical standards and financial regulations. The system aims to balance customization, user experience, and financial
+  efficacy, requiring continuous monitoring and adjustment for optimal performance.'
+user_stories: null
+architecture:
+- Node.js
+- MongoDB
+- PeeWee
+- Bootstrap
+- HTML
+- CSS3
+- Socket.io
+- TensorFlow
+- Keras
+- scikit-learn
+- pandas
+- NumPy
+- matplotlib
+- D3.js
+- axios
+- JWT
+- bcrypt
+- MetaApi SDK
+- cheerio
+- express
+development_plan:
+- description: Initialize the project structure with Node.js, set up an Express server, and create a default route.
+  programmatic_goal: The Express server must be running on a predefined port, with a GET endpoint at `/ping` which responds
+    with a status code 200 and a plain text message 'pong'.
+  user_review_goal: When accessing the '/ping' endpoint, the browser should display the text 'pong'.
+- description: Set up secure authentication and user account management using JWT and bcrypt.
+  programmatic_goal: Implement registration and login endpoints, integrating JWT for tokens and bcrypt for password hashing.
+    Include middleware to validate authentication tokens on protected routes.
+  user_review_goal: A user should be able to register and subsequently log in, with invalid attempts properly rejected.
+- description: Install and configure the MetaApi SDK to establish connectivity with MetaTrader platforms.
+  programmatic_goal: Create a service to authenticate with MetaApi and verify successful connection to both MT4 and MT5 platforms
+    using test credentials.
+  user_review_goal: Ensure the connection to MetaTrader is established and can be demonstrated via a test account's successful
+    connection status.
+- description: Create the base AI decision-making engine structure with TensorFlow, Keras, and scikit-learn, allowing the
+    input of user-defined strategies.
+  programmatic_goal: Develop a basic ML model setup capable of ingesting user-defined parameters and historical data, and
+    include a unit test confirming that the model can be trained with dummy data.
+  user_review_goal: A predefined and training-capable ML model structure must be in place, evidenced by a successful training
+    test run.
+- description: Implement the data processing module to fetch and prepare real-time market data for analysis.
+  programmatic_goal: Build a module that utilizes pandas and NumPy to acquire, parse, and format live trading data, ensuring
+    that it's compatible with the ML model's input requirements.
+  user_review_goal: Real-time market data should be processed and formatted appropriately, ready for use in the trading algorithm.
+- description: Design and implement the Graf visualization component using D3.js that dynamically displays account growth
+    and strategy insights.
+  programmatic_goal: Produce a series of D3.js charts that are connected to a mock backend data source reflecting hypothetical
+    account performance and strategy statistics.
+  user_review_goal: Visually appealing and interactive charts should display simulated account performance metrics on the
+    front-end.
+- description: Develop the user feedback mechanism to personalize AI strategies and risk management rules.
+  programmatic_goal: Construct an interface for user feedback input that adapts the AI model's parameters and incorporate
+    a versioning system to track changes.
+  user_review_goal: Users must be able to provide feedback that influence strategy decisions, with the application showing
+    updated strategy parameters accordingly.
+- description: Implement risk management algorithms to autonomously calculate stop-loss and take-profit parameters based on
+    AI and ML recommendations.
+  programmatic_goal: Code an algorithm using ML outputs to determine and set suitable stop-loss and take-profit thresholds,
+    including logging capabilities for analysis.
+  user_review_goal: The app should autonomously assign stop-loss and take-profit levels to trades based on AI analysis, with
+    logs available for review.
+- description: Incorporate real-time news analysis into the trading algorithm using cheerio and axios to parse news feeds.
+  programmatic_goal: Establish a function that fetches, scores, and integrates the sentiment derived from financial news articles
+    into the trading decision process.
+  user_review_goal: The AI should exhibit changes in trading behavior based on the interpreted sentiment of recent financial
+    news articles.
+- description: Finalize and integrate all components into a cohesive system with an initial testing phase on a demo trading
+    account.
+  programmatic_goal: Complete the setup ensuring all components (AI/ML engine, Graf, data processing, and risk management)
+    interact as required, with automated tests validating the basic workflow on a demo MetaTrader account.
+  user_review_goal: The integrated system must perform analysis, execute trades, and visually represent the results on a user
+    interface, all functioning correctly when assessed with a demo account.

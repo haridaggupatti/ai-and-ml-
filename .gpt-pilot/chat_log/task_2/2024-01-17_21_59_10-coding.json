@@ -1,0 +1,25 @@
+{
+  "endpoint": "OPENAI",
+  "model": "gpt-4-1106-preview",
+  "functions": [
+    {
+      "name": "get_fully_coded_file",
+      "description": "Gets the fully coded file.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "file_content": {
+            "type": "string",
+            "description": "Fully coded file. This contains only the lines of code and no other text."
+          }
+        },
+        "required": [
+          "file_content"
+        ]
+      }
+    }
+  ],
+  "response": {
+    "file_content": "const express = require('express');\nconst User = require('../models/User');\nconst bcrypt = require('bcryptjs');\nconst { generateToken } = require('../utils/jwtUtils');\nconst winston = require('winston');\nconst router = express.Router();\n\n// Simple logger setup\nconst logger = winston.createLogger({\n  level: 'error',\n  format: winston.format.json(),\n  transports: [\n    new winston.transports.File({ filename: 'error.log', level: 'error' }),\n  ],\n});\n\nrouter.post('/register', async (req, res) => {\n  try {\n    const { username, password } = req.body;\n    let user = await User.findOne({ username });\n    if (user) {\n      return res.status(400).json({ message: 'User already exists' });\n    }\n    const salt = bcrypt.genSaltSync(10);\n    const hash = bcrypt.hashSync(password, salt);\n    user = new User({ username, password: hash });\n    await user.save();\n    const token = generateToken(user);\n    res.status(201).json({ token });\n  } catch (error) {\n    logger.error(error);\n    res.status(500).json({ message: 'Error registering new user' });\n  }\n});\n\nrouter.post('/login', async (req, res) => {\n  try {\n    const { username, password } = req.body;\n    const user = await User.findOne({ username });\n    if (!user) {\n      return res.status(401).json({ message: 'Authentication failed. User not found.' });\n    }\n    user.comparePassword(password, (err, isMatch) => {\n      if (isMatch && !err) {\n        const token = generateToken(user);\n        res.json({ token });\n      } else {\n        res.status(401).json({ message: 'Authentication failed. Wrong password.' });\n      }\n    });\n  } catch (error) {\n    logger.error(error);\n    res.status(500).json({ message: 'Error logging in user' });\n  }\n});\n\nmodule.exports = router;\n"
+  }
+}

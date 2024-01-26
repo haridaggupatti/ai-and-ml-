@@ -1,0 +1,37 @@
+{
+  "endpoint": "OPENAI",
+  "model": "gpt-4-1106-preview",
+  "functions": [
+    {
+      "name": "get_documentation_file",
+      "description": "Gets the full content of requested documentation file.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Name of the documentation file that needs to be saved on the disk."
+          },
+          "path": {
+            "type": "string",
+            "description": "Relative path of the documentation file with the file name that needs to be saved."
+          },
+          "content": {
+            "type": "string",
+            "description": "Full content of the documentation file that needs to be saved on the disk. **IMPORTANT**When you want to add a comment that tells the user to add the previous implementation at that place, make sure that the comment starts with `[OLD CODE]` and add a description of what old code should be inserted here. For example, `[OLD CODE] Login route`."
+          }
+        },
+        "required": [
+          "name",
+          "path",
+          "content"
+        ]
+      }
+    }
+  ],
+  "response": {
+    "name": "README.md",
+    "path": "ai_and_ml_/README.md",
+    "content": "# ai_and_ml_\n\nThe \"ai_and_ml_\" application is designed to interface with the MetaTrader 4 (MT4) and MetaTrader 5 (MT5) platforms, performing analysis and executing trades within the financial markets using artificial intelligence (AI) and machine learning (ML).\n\n## Key Features\n- AI-driven decision-making engine for trade execution\n- Customizable trading strategies based on user-defined methods\n- Visual growth tracking with strategy insights\n- Continuous learning from historical and real-time market data \n- User feedback incorporation for strategy and risk management\n- Secure authentication system for strategy management and analytics\n\n## User Stories\n- Users can expect trade execution with over 80% accuracy through neural network utilization.\n- The application is capable of analyzing online news sources daily to inform trading decisions.\n\n## Technologies\n- Node.js, MongoDB, PeeWee, Bootstrap, HTML, CSS3, Socket.io\n- TensorFlow, Keras, scikit-learn, pandas, NumPy, matplotlib, D3.js\n- axios, JWT, bcrypt, MetaApi SDK, cheerio, express\n\n## Installation\nTo get started with \"ai_and_ml_\", clone the repository and install dependencies:\n```\ngit clone [REPOSITORY_URL] # Clone the repository\n\n# Navigate into the project directory\ncd ai_and_ml_\n\n# Install dependencies\nnpm install\n```\n\n## Configuration\nSet up your environment variables based on the template provided in `.env.example`:\n```\ncp .env.example .env\n# Edit .env file with appropriate values\ndatabase_url=YOUR_MONGO_DATABASE_URL\nmeta_api_key=YOUR_META_API_KEY\nmeta_api_account_id=YOUR_META_API_ACCOUNT_ID\njwt_secret=YOUR_JWT_SECRET\n```\n\n## Running the Application\nRun the application by executing:\n```\nnpm start\n```\nThis will start the server on the defined port and the application will be ready to connect to MetaTrader platforms and process trading strategies.\n\n## Documentation\nA comprehensive guide to using the \"ai_and_ml_\" application, along with developer documentation, can be found in the `/docs` directory.\n\n## Contributing\nIf you're interested in contributing to the project, please read through the `CONTRIBUTING.md` file for guidelines on how to submit improvements.\n\n## License\nThis project is licensed under the ISC License - see the `LICENSE.md` file for details."
+  }
+}

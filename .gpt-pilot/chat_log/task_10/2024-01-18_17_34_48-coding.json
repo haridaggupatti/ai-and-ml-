@@ -1,0 +1,25 @@
+{
+  "endpoint": "OPENAI",
+  "model": "gpt-4-1106-preview",
+  "functions": [
+    {
+      "name": "get_fully_coded_file",
+      "description": "Gets the fully coded file.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "file_content": {
+            "type": "string",
+            "description": "Fully coded file. This contains only the lines of code and no other text."
+          }
+        },
+        "required": [
+          "file_content"
+        ]
+      }
+    }
+  ],
+  "response": {
+    "file_content": "const app = {\n    startDemoTrading: async function () {\n        const response = await fetch('/api/trading/start-demo-trading', { method: 'POST' });\n        const data = await response.json();\n        console.log(data);\n        if (data.success) {\n            this.loadGrafVisualization();\n        } else {\n            console.error('Failed to start demo trading:', data.message);\n        }\n    },\n\n    loadGrafVisualization: async function() {\n        const grafResponse = await fetch('/api/graf/account-growth');\n        const grafData = await grafResponse.json();\n        if (grafResponse.ok) {\n            const grafElement = document.getElementById('graf');\n            if (grafElement) {\n              grafElement.innerHTML = '<h3>Account Growth Over Time</h3>';\n              grafElement.innerHTML += '<canvas id=\"accountGrowthCanvas\"></canvas>';\n              const ctx = document.getElementById('accountGrowthCanvas').getContext('2d');\n              new Chart(ctx, {\n                  type: 'line',\n                  data: {\n                      labels: grafData.labels,\n                      datasets: [{\n                          label: grafData.title,\n                          data: grafData.data,\n                          fill: false,\n                          borderColor: 'rgb(75, 192, 192)',\n                          tension: 0.1\n                      }]\n                  },\n                  options: {\n                      scales: {\n                          y: {\n                              beginAtZero: true\n                          }\n                      }\n                  }\n              });\n            } else {\n              console.error('grafElement not found');\n            }\n          } else {\n            console.error('Error loading graf data:', grafData.message);\n          }\n    }\n};\n"
+  }
+}

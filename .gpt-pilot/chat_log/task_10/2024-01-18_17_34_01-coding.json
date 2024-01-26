@@ -1,0 +1,25 @@
+{
+  "endpoint": "OPENAI",
+  "model": "gpt-4-1106-preview",
+  "functions": [
+    {
+      "name": "get_fully_coded_file",
+      "description": "Gets the fully coded file.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "file_content": {
+            "type": "string",
+            "description": "Fully coded file. This contains only the lines of code and no other text."
+          }
+        },
+        "required": [
+          "file_content"
+        ]
+      }
+    }
+  ],
+  "response": {
+    "file_content": "const axios = require('axios');\nconst TradeController = require('../controllers/TradeController');\nconst RiskManagementService = require('../services/RiskManagementService');\nconst RiskPredictionModel = require('../ai/RiskPredictionModel');\nconst logger = require('../utils/logger');\nrequire('dotenv').config();\n\nclass TradingOrchestrator {\n  constructor() {\n    const metaApiConnection = new MetaApiConnection(process.env.DEMO_META_API_KEY, process.env.DEMO_META_API_ACCOUNT_ID);\n    this.tradeController = new TradeController(metaApiConnection);\n    this.dataProcessor = new DataProcessor(new MetaApiClient(process.env.DEMO_META_API_KEY));\n  }\n\n  async startDemoTrading(user) {\n    try {\n      const marketData = await axios.get(process.env.DEMO_API_ENDPOINT);\n      const strategyConfig = await applyFeedbackToStrategy(user._id, {\n        // Fetch market data\n        const marketData = await this.fetchDemoMarketData();\n\n        // Apply user feedback to strategy configuration\n        await applyFeedbackToStrategy(user._id, strategyConfig);\n\n        // Make trading decision based on AI analysis\n        const decision = await makeDecision(user._id, strategyConfig, marketData);\n\n        // Execute trade if decision is affirmative\n        if (decision.shouldTrade) {\n          await this.tradeController.executeTrade(marketData, decision.tradeId);\n        }\n\n        // Visualize results using Graf\n        const grafData = await fetchAccountGrowthData();\n        this.visualizeWithGraf(grafData);\n\n        // Train model with new data (Here you would capture new live training data and retrain periodically)\n        const { xs, ys } = prepareTrainingData(marketData);\n        await trainModel(xs, ys, strategyConfig);\n      });\n      const grafData = await fetchAccountGrowthData();\n      this.visualizeWithGraf(grafData);\n      return { success: true, message: 'Demo trading session started successfully' };\n    } catch (error) {\n      logger.error(`Error during demo trading: ${error.message}`);\n      return { success: false, message: 'Error during demo trading session', error: error.message };\n    }\n  }\n}\nmodule.exports = TradingOrchestrator;\n"
+  }
+}

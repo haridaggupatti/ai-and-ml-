@@ -1,0 +1,99 @@
+{
+  "endpoint": "OPENAI",
+  "model": "gpt-4-1106-preview",
+  "functions": [
+    {
+      "name": "implement_development_plan",
+      "description": "Implements the development plan.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "plan": {
+            "type": "array",
+            "description": "List of development tasks that need to be done to implement the entire plan.",
+            "items": {
+              "type": "object",
+              "description": "Development task that needs to be done to implement the entire plan.",
+              "properties": {
+                "description": {
+                  "type": "string",
+                  "description": "Description of the development task that needs to be done to implement the entire plan."
+                },
+                "programmatic_goal": {
+                  "type": "string",
+                  "description": "Detailed description of programmatic goal. Programmatic goal that will determine if a task can be marked as done from a programmatic perspective (this will result in an automated test that is run before the task is sent to you for a review). All details previously specified by user that are important for this task must be included in this programmatic goal."
+                },
+                "user_review_goal": {
+                  "type": "string",
+                  "description": "User review goal that will determine if a task is done or not, but from a user perspective since it will be reviewed by a human."
+                }
+              },
+              "required": [
+                "description",
+                "programmatic_goal",
+                "user_review_goal"
+              ]
+            }
+          }
+        },
+        "required": [
+          "plan"
+        ]
+      }
+    }
+  ],
+  "response": {
+    "plan": [
+      {
+        "description": "Initialize the project structure with Node.js, set up an Express server, and create a default route.",
+        "programmatic_goal": "The Express server must be running on a predefined port, with a GET endpoint at `/ping` which responds with a status code 200 and a plain text message 'pong'.",
+        "user_review_goal": "When accessing the '/ping' endpoint, the browser should display the text 'pong'."
+      },
+      {
+        "description": "Set up secure authentication and user account management using JWT and bcrypt.",
+        "programmatic_goal": "Implement registration and login endpoints, integrating JWT for tokens and bcrypt for password hashing. Include middleware to validate authentication tokens on protected routes.",
+        "user_review_goal": "A user should be able to register and subsequently log in, with invalid attempts properly rejected."
+      },
+      {
+        "description": "Install and configure the MetaApi SDK to establish connectivity with MetaTrader platforms.",
+        "programmatic_goal": "Create a service to authenticate with MetaApi and verify successful connection to both MT4 and MT5 platforms using test credentials.",
+        "user_review_goal": "Ensure the connection to MetaTrader is established and can be demonstrated via a test account's successful connection status."
+      },
+      {
+        "description": "Create the base AI decision-making engine structure with TensorFlow, Keras, and scikit-learn, allowing the input of user-defined strategies.",
+        "programmatic_goal": "Develop a basic ML model setup capable of ingesting user-defined parameters and historical data, and include a unit test confirming that the model can be trained with dummy data.",
+        "user_review_goal": "A predefined and training-capable ML model structure must be in place, evidenced by a successful training test run."
+      },
+      {
+        "description": "Implement the data processing module to fetch and prepare real-time market data for analysis.",
+        "programmatic_goal": "Build a module that utilizes pandas and NumPy to acquire, parse, and format live trading data, ensuring that it's compatible with the ML model's input requirements.",
+        "user_review_goal": "Real-time market data should be processed and formatted appropriately, ready for use in the trading algorithm."
+      },
+      {
+        "description": "Design and implement the Graf visualization component using D3.js that dynamically displays account growth and strategy insights.",
+        "programmatic_goal": "Produce a series of D3.js charts that are connected to a mock backend data source reflecting hypothetical account performance and strategy statistics.",
+        "user_review_goal": "Visually appealing and interactive charts should display simulated account performance metrics on the front-end."
+      },
+      {
+        "description": "Develop the user feedback mechanism to personalize AI strategies and risk management rules.",
+        "programmatic_goal": "Construct an interface for user feedback input that adapts the AI model's parameters and incorporate a versioning system to track changes.",
+        "user_review_goal": "Users must be able to provide feedback that influence strategy decisions, with the application showing updated strategy parameters accordingly."
+      },
+      {
+        "description": "Implement risk management algorithms to autonomously calculate stop-loss and take-profit parameters based on AI and ML recommendations.",
+        "programmatic_goal": "Code an algorithm using ML outputs to determine and set suitable stop-loss and take-profit thresholds, including logging capabilities for analysis.",
+        "user_review_goal": "The app should autonomously assign stop-loss and take-profit levels to trades based on AI analysis, with logs available for review."
+      },
+      {
+        "description": "Incorporate real-time news analysis into the trading algorithm using cheerio and axios to parse news feeds.",
+        "programmatic_goal": "Establish a function that fetches, scores, and integrates the sentiment derived from financial news articles into the trading decision process.",
+        "user_review_goal": "The AI should exhibit changes in trading behavior based on the interpreted sentiment of recent financial news articles."
+      },
+      {
+        "description": "Finalize and integrate all components into a cohesive system with an initial testing phase on a demo trading account.",
+        "programmatic_goal": "Complete the setup ensuring all components (AI/ML engine, Graf, data processing, and risk management) interact as required, with automated tests validating the basic workflow on a demo MetaTrader account.",
+        "user_review_goal": "The integrated system must perform analysis, execute trades, and visually represent the results on a user interface, all functioning correctly when assessed with a demo account."
+      }
+    ]
+  }
+}

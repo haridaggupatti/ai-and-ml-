@@ -1,0 +1,124 @@
+{
+  "endpoint": "OPENAI",
+  "model": "gpt-4-1106-preview",
+  "functions": [
+    {
+      "name": "parse_development_task",
+      "description": "Breaks down the development task into smaller steps that need to be done to implement the entire task.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "tasks": {
+            "type": "array",
+            "description": "List of smaller development steps that need to be done to complete the entire task.",
+            "items": {
+              "type": "object",
+              "description": "A smaller development step that needs to be done to complete the entire task.  Remember, if you need to run a command that doesn't finish by itself (eg. a command to run an  If you need to create a directory that doesn't exist and is not the root project directory, always create it by running a command `mkdir`",
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "enum": [
+                    "command",
+                    "code_change",
+                    "human_intervention"
+                  ],
+                  "description": "Type of the development step that needs to be done to complete the entire task."
+                },
+                "command": {
+                  "type": "object",
+                  "description": "Command that needs to be run to complete the current task. This should be used only if the task is of a type \"command\".",
+                  "properties": {
+                    "command": {
+                      "type": "string",
+                      "description": "A single command that needs to be executed."
+                    },
+                    "timeout": {
+                      "type": "number",
+                      "description": "Timeout in milliseconds that represent the approximate time this command takes to finish. If you need to run a command that doesnt't finish by itself (eg. a command to run an app), set the timeout to to a value long enough to determine that it has started successfully and provide a command_id. If you need to create a directory that doesn't exist and is not the root project directory, always create it by running a command `mkdir`"
+                    },
+                    "success_message": {
+                      "type": "string",
+                      "description": "A message to look for in the output of the command to determine if successful or not."
+                    },
+                    "command_id": {
+                      "type": "string",
+                      "description": "If the process needs to continue running after the command is executed provide a unique command identifier which you can use to kill the process later."
+                    }
+                  },
+                  "required": [
+                    "command",
+                    "timeout"
+                  ]
+                },
+                "code_change": {
+                  "type": "object",
+                  "description": "A code change that needs to be implemented. This should be used only if the task is of a type \"code_change\".",
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "description": "Name of the file that needs to be implemented."
+                    },
+                    "path": {
+                      "type": "string",
+                      "description": "Full path of the file with the file name that needs to be implemented."
+                    },
+                    "content": {
+                      "type": "string",
+                      "description": "Full content of the file that needs to be implemented. **IMPORTANT**When you want to add a comment that tells the user to add the previous implementation at that place, make sure that the comment starts with `[OLD CODE]` and add a description of what old code should be inserted here. For example, `[OLD CODE] Login route`."
+                    }
+                  },
+                  "required": [
+                    "name",
+                    "path",
+                    "content"
+                  ]
+                },
+                "human_intervention_description": {
+                  "type": "string",
+                  "description": "Description of a step in debugging this issue when there is a human intervention needed. This should be used only if the task is of a type \"human_intervention\"."
+                }
+              },
+              "required": [
+                "type"
+              ]
+            }
+          }
+        },
+        "required": [
+          "tasks"
+        ]
+      }
+    }
+  ],
+  "response": {
+    "tasks": [
+      {
+        "type": "command",
+        "command": {
+          "command": "npm install winston",
+          "timeout": 60000
+        }
+      },
+      {
+        "type": "code_change",
+        "code_change": {
+          "name": "index.js",
+          "path": "/index.js",
+          "content": "require('dotenv').config();\nconst express = require('express');\nconst mongoose = require('mongoose');\nconst bodyParser = require('body-parser');\nconst authRoutes = require('./routes/authRoutes');\nconst app = express();\nconst port = process.env.PORT || 3000;\n\nmongoose.connect('mongodb://localhost/ai_and_ml_');\n\napp.use(bodyParser.json());\napp.use('/api/auth', authRoutes);\n\napp.get('/ping', (req, res) => {\n  res.send('pong');\n});\n\n// Centralized error handling\napp.use((err, req, res, next) => {\n  logger.error(err.stack);\n  const status = err.status || 500;\n  res.status(status).json({ message: err.message || \"Internal Server Error\" });\n});\n\nconst winston = require('winston');\nconst logger = winston.createLogger({\n  level: 'error',\n  format: winston.format.json(),\n  transports: [\n    new winston.transports.File({ filename: 'error.log', level: 'error' })\n  ]\n});\n\napp.listen(port, () => {\n  console.log(`Server is running on port ${port}`);\n}).on('error', (err) => {\n  console.error(`Error starting server: ${err.message}`);\n});\n"
+        }
+      },
+      {
+        "type": "code_change",
+        "code_change": {
+          "name": "authRoutes.js",
+          "path": "/routes/authRoutes.js",
+          "content": "const express = require('express');\nconst User = require('../models/User');\nconst { generateToken } = require('../utils/jwtUtils');\nconst winston = require('winston');\nconst router = express.Router();\n\n// Simple logger setup\nconst logger = winston.createLogger({\n  level: 'error',\n  format: winston.format.json(),\n  transports: [\n    new winston.transports.File({ filename: 'error.log', level: 'error' }),\n  ],\n});\n\nrouter.post('/register', async (req, res) => {\n  try {\n    // ... Registration logic ...\n  } catch (error) {\n    logger.error(error);\n    res.status(500).json({ message: 'Error registering new user' });\n  }\n});\n\nrouter.post('/login', async (req, res) => {\n  try {\n    // [OLD CODE] Login route\n  } catch (error) {\n    logger.error(error);\n    res.status(500).json({ message: 'Error logging in user' });\n  }\n});\n\nmodule.exports = router;\n"
+        }
+      },
+      {
+        "type": "human_intervention",
+        "human_intervention_description": "Generate a new JWT_SECRET using a secure method such as Node.js's crypto module. Replace the JWT_SECRET in the .env file with that value."
+      }
+    ]
+  }
+}

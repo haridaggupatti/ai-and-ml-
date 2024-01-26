@@ -1,0 +1,227 @@
+endpoint: OPENAI
+model: gpt-4-1106-preview
+messages:
+- role: system
+  content: You are a full stack software developer who works in a software development agency. You write very modular and
+    clean code. Your job is to implement tasks that your tech lead assigns you. Each task has a description of what needs
+    to be implemented, a programmatic goal that will determine if a task can be marked as done and user-review goal that will
+    determine if a task is done or not but from a user perspective since it will be reviewed by a human.
+- role: user
+  content: "You are working on a App called \"ai_and_ml_\" and you need to write code for the entire application.\n\nHere\
+    \ is a high level description of \"ai_and_ml_\":\n```\nThe project will encompass the development of a software application,\
+    \ designated as \"ai_and_ml_\", designed to interface with MetaTrader 4 (MT4) and MetaTrader 5 (MT5) platforms via APIs,\
+    \ webhooks, or HTTP protocols. The application will perform analysis and execute trades automatically within the financial\
+    \ markets, supporting all trading instruments available on these platforms.\n\nKey features of \"ai_and_ml_\" will include:\n\
+    \n- A decision-making engine using artificial intelligence (AI) and machine learning (ML) to autonomously determine when\
+    \ to execute trades.\n- Customizable user-defined trading strategies, which once written and saved in normal language,\
+    \ allow the application to trade based on specific methods like martingale, averaging, high-frequency trading (HFT), or\
+    \ bespoke strategies.\n- A visual graphical representation (Graf) for tracking account growth, providing insights and\
+    \ advice for strategy improvement.\n- The capability to learn and evolve its decision-making process through the analysis\
+    \ of historical data, factoring in real-time market behaviors and user feedback.\n- An AI component that employs statistical\
+    \ analysis, machine learning models, and deep learning to analyze historical data, with a caution against overfitting\
+    \ and market evolution.\n- Processing of real-time market data through advanced algorithms to respond to live market changes,\
+    \ coupled with challenges related to data volatility.\n- A mechanism for user feedback incorporation, allowing personalization\
+    \ of the AI and adjustment of trading strategies and risk management rules.\n- A comprehensive integration of these elements\
+    \ for continuous learning and adaptation, using techniques such as online learning and reinforcement learning, while ensuring\
+    \ ethical and regulatory compliance.\n- Risk management features with AI and ML creating autonomous decisions on aspects\
+    \ such as stop-loss and take-profit parameters.\n- A secure user authentication system to control access to personal trading\
+    \ strategies and performance analytics.\n\nThe AI and ML components will be developed to progressively enhance their decision-making\
+    \ capabilities while conforming to ethical standards and financial regulations. The system aims to balance customization,\
+    \ user experience, and financial efficacy, requiring continuous monitoring and adjustment for optimal performance.\n```\n\
+    \nHere are the technologies that you need to use for this project:\n```\n- Node.js\n- MongoDB\n- PeeWee\n- Bootstrap\n\
+    - HTML\n- CSS3\n- Socket.io\n- TensorFlow\n- Keras\n- scikit-learn\n- pandas\n- NumPy\n- matplotlib\n- D3.js\n- axios\n\
+    - JWT\n- bcrypt\n- MetaApi SDK\n- cheerio\n- express\n```\n\n\nDevelopment process of this app was split into smaller\
+    \ tasks. Here is the list of all tasks:\n```\n1. Initialize the project structure with Node.js, set up an Express server,\
+    \ and create a default route.\n\n2. Set up secure authentication and user account management using JWT and bcrypt.\n\n\
+    3. Install and configure the MetaApi SDK to establish connectivity with MetaTrader platforms.\n\n4. Create the base AI\
+    \ decision-making engine structure with TensorFlow, Keras, and scikit-learn, allowing the input of user-defined strategies.\n\
+    \n5. Implement the data processing module to fetch and prepare real-time market data for analysis.\n\n6. Design and implement\
+    \ the Graf visualization component using D3.js that dynamically displays account growth and strategy insights.\n\n7. Develop\
+    \ the user feedback mechanism to personalize AI strategies and risk management rules.\n\n8. Implement risk management\
+    \ algorithms to autonomously calculate stop-loss and take-profit parameters based on AI and ML recommendations.\n\n9.\
+    \ Incorporate real-time news analysis into the trading algorithm using cheerio and axios to parse news feeds.\n\n10. Finalize\
+    \ and integrate all components into a cohesive system with an initial testing phase on a demo trading account.\n\n```\n\
+    You are currently working on task \"Set up secure authentication and user account management using JWT and bcrypt.\" and\
+    \ you have to focus only on that task.\n\n\nA part of the app is already finished.Here are files that are currently implemented:\n\
+    \n**/package.json**\n```\n{\n  \"name\": \"ai_and_ml_\",\n  \"version\": \"1.0.0\",\n  \"description\": \"\",\n  \"main\"\
+    : \"index.js\",\n  \"scripts\": {\n    \"test\": \"echo \\\"Error: no test specified\\\" && exit 1\"\n  },\n  \"keywords\"\
+    : [],\n  \"author\": \"\",\n  \"license\": \"ISC\",\n  \"dependencies\": {\n    \"bcrypt\": \"^5.1.1\",\n    \"bcryptjs\"\
+    : \"^2.4.3\",\n    \"dotenv\": \"^16.3.1\",\n    \"express\": \"^4.18.2\",\n    \"jsonwebtoken\": \"^9.0.2\",\n    \"\
+    mongoose\": \"^8.1.0\"\n  }\n}\n\n```\n\n**/index.js**\n```\nrequire('dotenv').config();\nconst express = require('express');\n\
+    const mongoose = require('mongoose');\nconst bodyParser = require('body-parser');\nconst authRoutes = require('./routes/authRoutes');\n\
+    const app = express();\nconst port = process.env.PORT || 3000;\n\nmongoose.connect('mongodb://localhost/ai_and_ml_', {\
+    \ useNewUrlParser: true, useUnifiedTopology: true });\n\napp.use(bodyParser.json());\napp.use('/api/auth', authRoutes);\n\
+    \napp.get('/ping', (req, res) => {\n  res.send('pong');\n});\n\napp.listen(port, () => {\n  console.log(`Server is running\
+    \ on port ${port}`);\n});\n\n```\n\n**/.env**\n```\nJWT_SECRET=YourVerySecretKey // INPUT_REQUIRED {eyJhbGciOiJIUzI1NiJ9.eyJSb2xlIjoiQWRtaW4iLCJJc3N1ZXIiOiJJc3N1ZXIiLCJVc2VybmFtZSI6IkphdmFJblVzZSIsImV4cCI6MTcwNTQ5MTI5NiwiaWF0IjoxNzA1NDkxMjk2fQ.qpjSB8WwIMZHDxibCvmvu26HsGhCtpm5yMig69JfCrU\n\
+    }\n\n```\n\n**middlewares/authMiddleware.js**\n```\nconst { verifyToken } = require('../utils/jwtUtils');\n\nconst authMiddleware\
+    \ = (req, res, next) => {\n  const token = req.headers.authorization?.split(' ')[1]; // Expecting \"Bearer TOKEN_STRING\"\
+    \n  const verifiedToken = verifyToken(token);\n  if (!verifiedToken) {\n    return res.status(401).json({ message: 'Unauthorized\
+    \ access' });\n  }\n  req.user = verifiedToken;\n  next();\n};\n\nmodule.exports = authMiddleware;\n\n```\n\n**models/User.js**\n\
+    ```\nconst mongoose = require('mongoose');\nconst bcrypt = require('bcryptjs');\n\nconst UserSchema = new mongoose.Schema({\n\
+    \  username: {\n    type: String,\n    unique: true,\n    required: true\n  },\n  password: {\n    type: String,\n   \
+    \ required: true\n  }\n});\n\nUserSchema.pre('save', function(next) {\n  if (this.isModified('password') || this.isNew)\
+    \ {\n    const salt = bcrypt.genSaltSync(10);\n    this.password = bcrypt.hashSync(this.password, salt);\n  }\n  next();\n\
+    });\n\nUserSchema.methods.comparePassword = function(pw, cb) {\n  bcrypt.compare(pw, this.password, (err, isMatch) =>\
+    \ {\n    if (err) {\n      return cb(err);\n    }\n    cb(null, isMatch);\n  });\n};\n\nmodule.exports = mongoose.model('User',\
+    \ UserSchema);\n\n```\n\n**routes/authRoutes.js**\n```\nconst express = require('express');\nconst User = require('../models/User');\n\
+    const bcrypt = require('bcryptjs');\nconst { generateToken } = require('../utils/jwtUtils');\n\nconst router = express.Router();\n\
+    \nrouter.post('/register', async (req, res) => {\n  try {\n    const { username, password } = req.body;\n    let user\
+    \ = await User.findOne({ username });\n    if (user) {\n      return res.status(400).json({ message: 'User already exists'\
+    \ });\n    }\n    user = new User({ username, password });\n    await user.save();\n    const token = generateToken(user);\n\
+    \    res.status(201).json({ token });\n  } catch (error) {\n    res.status(500).json({ message: 'Error registering new\
+    \ user' });\n  }\n});\n\nrouter.post('/login', async (req, res) => {\n  try {\n    const { username, password } = req.body;\n\
+    \    const user = await User.findOne({ username });\n    if (!user) {\n      return res.status(401).json({ message: 'Authentication\
+    \ failed. User not found.' });\n    }\n    user.comparePassword(password, (err, isMatch) => {\n      if (isMatch && !err)\
+    \ {\n        const token = generateToken(user);\n        res.json({ token });\n      } else {\n        res.status(401).json({\
+    \ message: 'Authentication failed. Wrong password.' });\n      }\n    });\n  } catch (error) {\n    res.status(500).json({\
+    \ message: 'Error logging in user' });\n  }\n});\n\nmodule.exports = router;\n\n```\n\n**utils/jwtUtils.js**\n```\nconst\
+    \ jwt = require('jsonwebtoken');\nrequire('dotenv').config();\n\nconst JWT_SECRET = process.env.JWT_SECRET;\n\nif (!JWT_SECRET\
+    \ || JWT_SECRET.length < 64) {\n  throw new Error('JWT_SECRET is undefined or too short. Please set a proper JWT_SECRET\
+    \ in your .env file.'); // INPUT_REQUIRED {Set a proper JWT_SECRET in your .env file that is at least 64 characters long}\n\
+    }\n\nconst generateToken = (user) => {\n  return jwt.sign({ userId: user._id }, JWT_SECRET);\n};\n\nconst verifyToken\
+    \ = (token) => {\n  try {\n    return jwt.verify(token, JWT_SECRET);\n  } catch (e) {\n    return null;\n  }\n};\n\nmodule.exports\
+    \ = {\n  generateToken,\n  verifyToken\n};\n\n```\n\n\nNow, your colleague who is testing the app \"ai_and_ml_\" sent\
+    \ you some additional info. Here it is:\n```\nThis site can\u2019t be reachedlocalhost refused to connect.\nTry:\n\nChecking\
+    \ the connection\nChecking the proxy and the firewall\nERR_CONNECTION_REFUSED\nit was giting like this \n```\n\nCan you\
+    \ debug this issue or implement changes to comply with the additional user input?\n\nTell me all the new code that needs\
+    \ to be written or modified to implement current task and have it fully working. You can count that the environment is\
+    \ set up previously and packages listed in files are installed so tell me only commands needed for installation of new\
+    \ dependencies, if there are any.\n\n\n**IMPORTANT**\nWhen you think about in which file should the new code go to, always\
+    \ try to make files as small as possible and put code in more smaller files rather than in one big file. Whenever a file\
+    \ becomes too large (more than 50 lines of code) split it into smaller files.\n\n\nYou do not need to make any automated\
+    \ tests work.\n\n**IMPORTANT**\nDo not tell me anything about setting up the database or anything OS related - only if\
+    \ some dependencies need to be installed."
+- role: assistant
+  content: "Based on the information provided and the error message received from your colleague, it appears the issue might\
+    \ be related to the server not running properly, which causes the connection to be refused when attempting to access the\
+    \ localhost.\n\nLet's go through some possible issues and solutions within the context of our Node.js application setup:\n\
+    \n1. **Server Not Running**:\n   - Ensure that Node.js server is running by executing `npm start` or `node index.js` (depending\
+    \ on how `package.json` is configured under scripts).\n   - Verify that any other environment-specific issues are not\
+    \ affecting the startup of the server.\n\n2. **Port Issue**:\n   - Make sure the `port` variable is correctly set in the\
+    \ `index.js` file and that port `3000` is not occupied by another service.\n   - Ensure that there are no firewalls blocking\
+    \ access to the specified port.\n\n3. **MongoDB Connection String**:\n   - Confirm that MongoDB is running and accessible\
+    \ on `localhost` at the default port.\n   - The connection string `mongodb://localhost/ai_and_ml_` might need to be updated\
+    \ if MongoDB is configured differently or if authentication is required.\n\n4. **Mongoose Deprecation Warnings**:\n  \
+    \ - Mongoose options are provided when connecting but may not be up-to-date with the current best practices. Ensure that\
+    \ the latest recommended MongoDB connection settings are used if there are deprecation warnings.\n\nGiven all parameters\
+    \ seem to be correct, the application server should start without issues. To check if the server is listening to the correct\
+    \ port, it might be helpful to add a more explicit error handler to the `listen` call in `index.js`:\n\n```javascript\n\
+    app.listen(port, () => {\n  console.log(`Server is running on port ${port}`);\n}).on('error', (err) => {\n  console.error(`Error\
+    \ starting server: ${err.message}`);\n});\n```\n\nIf this basic troubleshooting does not resolve the connection issue,\
+    \ you may need to look at network configurations or other environment-specific problems that are outside the scope of\
+    \ the application code.\n\nPlease note, there doesn't seem to be missing functionality in the code provided related to\
+    \ the authentication or account management tasks as per the specifications, so no additional code changes are required\
+    \ for that particular task. However, if you identify any specific bugs or logical errors in the code that need to be addressed,\
+    \ please provide more detail, and I will assist you with the fixes."
+- role: user
+  content: "\nI ran the command `npm start`. The output was:\n\nstderr:\n```\nnpm ERR! Missing script: \"start\"\nnpm ERR!\
+    \ \nnpm ERR! Did you mean one of these?\nnpm ERR!     npm star # Mark your favorite packages\nnpm ERR!     npm stars #\
+    \ View packages marked as favorites\nnpm ERR! \nnpm ERR! To see a list of scripts, run:\nnpm ERR!   npm run\n\nnpm ERR!\
+    \ A complete log of this run can be found in: C:\\Users\\Daggu\\AppData\\Local\\npm-cache\\_logs\\2024-01-17T11_54_59_721Z-debug-0.log\n\
+    \n```\nstdout:\n```\n\n```\n\nThink about this output and not any output in previous messages. If the command was successfully\
+    \ executed, respond with `DONE`. If it wasn't, respond with `NEEDS_DEBUGGING`.\n\nDo not respond with anything other than\
+    \ these two keywords."
+- role: assistant
+  content: NEEDS_DEBUGGING
+- role: user
+  content: "Ok, we need to debug this issue and we need to be able to execute `npm start` successfully. .\nHere is a brief\
+    \ explanation of what's happening:\n```\nstderr:\n```\nnpm ERR! Missing script: \"start\"\nnpm ERR! \nnpm ERR! Did you\
+    \ mean one of these?\nnpm ERR!     npm star # Mark your favorite packages\nnpm ERR!     npm stars # View packages marked\
+    \ as favorites\nnpm ERR! \nnpm ERR! To see a list of scripts, run:\nnpm ERR!   npm run\n\nnpm ERR! A complete log of this\
+    \ run can be found in: C:\\Users\\Daggu\\AppData\\Local\\npm-cache\\_logs\\2024-01-17T11_54_59_721Z-debug-0.log\n\n```\n\
+    stdout:\n```\n\n```\n```\nThe project directory tree looks like:\n\n/\n  /middlewares: authMiddleware.js\n  /models: User.js\n\
+    \  /routes: authRoutes.js\n  /utils: jwtUtils.js\n  .env, index.js, package-lock.json, package.json\n\n\nI want you to\
+    \ create a list of steps that are needed to debug this issue.\n\nA step can be either a `command` or `code_change`.\n\n\
+    `command` step will run a command on the machine and will return the CLI output to you so you can see what to do next.\
+    \ Note that the command will be run on a Windows machine.\n\n`code_change` step will change the code and you need to thoroughly\
+    \ describe what needs to be implemented. I will implement the requested changes and let you know.\n\nAlso, make sure that\
+    \ at least the last step has `check_if_fixed` set to TRUE.\n\n**IMPORTANT**\nWhen you think about in which file should\
+    \ the new code go to, always try to make files as small as possible and put code in more smaller files rather than in\
+    \ one big file. Whenever a file becomes too large (more than 50 lines of code) split it into smaller files.\n\n"
+- role: assistant
+  content: '{"thoughts": "The ''npm start'' command failed because there is no ''start'' script defined in package.json.",
+    "reasoning": "To run the Node.js application with ''npm start'', the package.json file must have a ''start'' script specified
+    in the ''scripts'' section. We will add this script pointing to ''node index.js'' to run the server.", "steps": [{"type":
+    "code_change", "code_change_description": "In the package.json file, under the ''scripts'' object, add a new key-value
+    pair: ''start'': ''node index.js''. This will define the ''start'' script to run the application.", "check_if_fixed":
+    false}, {"type": "command", "command": {"command": "npm start", "timeout": 3000}, "check_if_fixed": true}]}'
+- role: user
+  content: "Here are files that are currently implemented:\n\n**/package.json**\n```\n{\n  \"name\": \"ai_and_ml_\",\n  \"\
+    version\": \"1.0.0\",\n  \"description\": \"\",\n  \"main\": \"index.js\",\n  \"scripts\": {\n    \"test\": \"echo \\\"\
+    Error: no test specified\\\" && exit 1\"\n  },\n  \"keywords\": [],\n  \"author\": \"\",\n  \"license\": \"ISC\",\n  \"\
+    dependencies\": {\n    \"bcrypt\": \"^5.1.1\",\n    \"bcryptjs\": \"^2.4.3\",\n    \"dotenv\": \"^16.3.1\",\n    \"express\"\
+    : \"^4.18.2\",\n    \"jsonwebtoken\": \"^9.0.2\",\n    \"mongoose\": \"^8.1.0\"\n  }\n}\n\n```\n\n**/index.js**\n```\n\
+    require('dotenv').config();\nconst express = require('express');\nconst mongoose = require('mongoose');\nconst bodyParser\
+    \ = require('body-parser');\nconst authRoutes = require('./routes/authRoutes');\nconst app = express();\nconst port =\
+    \ process.env.PORT || 3000;\n\nmongoose.connect('mongodb://localhost/ai_and_ml_', { useNewUrlParser: true, useUnifiedTopology:\
+    \ true });\n\napp.use(bodyParser.json());\napp.use('/api/auth', authRoutes);\n\napp.get('/ping', (req, res) => {\n  res.send('pong');\n\
+    });\n\napp.listen(port, () => {\n  console.log(`Server is running on port ${port}`);\n});\n\n```\n\n**/.env**\n```\nJWT_SECRET=YourVerySecretKey\
+    \ // INPUT_REQUIRED {eyJhbGciOiJIUzI1NiJ9.eyJSb2xlIjoiQWRtaW4iLCJJc3N1ZXIiOiJJc3N1ZXIiLCJVc2VybmFtZSI6IkphdmFJblVzZSIsImV4cCI6MTcwNTQ5MTI5NiwiaWF0IjoxNzA1NDkxMjk2fQ.qpjSB8WwIMZHDxibCvmvu26HsGhCtpm5yMig69JfCrU\n\
+    }\n\n```\n\n**middlewares/authMiddleware.js**\n```\nconst { verifyToken } = require('../utils/jwtUtils');\n\nconst authMiddleware\
+    \ = (req, res, next) => {\n  const token = req.headers.authorization?.split(' ')[1]; // Expecting \"Bearer TOKEN_STRING\"\
+    \n  const verifiedToken = verifyToken(token);\n  if (!verifiedToken) {\n    return res.status(401).json({ message: 'Unauthorized\
+    \ access' });\n  }\n  req.user = verifiedToken;\n  next();\n};\n\nmodule.exports = authMiddleware;\n\n```\n\n**models/User.js**\n\
+    ```\nconst mongoose = require('mongoose');\nconst bcrypt = require('bcryptjs');\n\nconst UserSchema = new mongoose.Schema({\n\
+    \  username: {\n    type: String,\n    unique: true,\n    required: true\n  },\n  password: {\n    type: String,\n   \
+    \ required: true\n  }\n});\n\nUserSchema.pre('save', function(next) {\n  if (this.isModified('password') || this.isNew)\
+    \ {\n    const salt = bcrypt.genSaltSync(10);\n    this.password = bcrypt.hashSync(this.password, salt);\n  }\n  next();\n\
+    });\n\nUserSchema.methods.comparePassword = function(pw, cb) {\n  bcrypt.compare(pw, this.password, (err, isMatch) =>\
+    \ {\n    if (err) {\n      return cb(err);\n    }\n    cb(null, isMatch);\n  });\n};\n\nmodule.exports = mongoose.model('User',\
+    \ UserSchema);\n\n```\n\n**routes/authRoutes.js**\n```\nconst express = require('express');\nconst User = require('../models/User');\n\
+    const bcrypt = require('bcryptjs');\nconst { generateToken } = require('../utils/jwtUtils');\n\nconst router = express.Router();\n\
+    \nrouter.post('/register', async (req, res) => {\n  try {\n    const { username, password } = req.body;\n    let user\
+    \ = await User.findOne({ username });\n    if (user) {\n      return res.status(400).json({ message: 'User already exists'\
+    \ });\n    }\n    user = new User({ username, password });\n    await user.save();\n    const token = generateToken(user);\n\
+    \    res.status(201).json({ token });\n  } catch (error) {\n    res.status(500).json({ message: 'Error registering new\
+    \ user' });\n  }\n});\n\nrouter.post('/login', async (req, res) => {\n  try {\n    const { username, password } = req.body;\n\
+    \    const user = await User.findOne({ username });\n    if (!user) {\n      return res.status(401).json({ message: 'Authentication\
+    \ failed. User not found.' });\n    }\n    user.comparePassword(password, (err, isMatch) => {\n      if (isMatch && !err)\
+    \ {\n        const token = generateToken(user);\n        res.json({ token });\n      } else {\n        res.status(401).json({\
+    \ message: 'Authentication failed. Wrong password.' });\n      }\n    });\n  } catch (error) {\n    res.status(500).json({\
+    \ message: 'Error logging in user' });\n  }\n});\n\nmodule.exports = router;\n\n```\n\n**utils/jwtUtils.js**\n```\nconst\
+    \ jwt = require('jsonwebtoken');\nrequire('dotenv').config();\n\nconst JWT_SECRET = process.env.JWT_SECRET;\n\nif (!JWT_SECRET\
+    \ || JWT_SECRET.length < 64) {\n  throw new Error('JWT_SECRET is undefined or too short. Please set a proper JWT_SECRET\
+    \ in your .env file.'); // INPUT_REQUIRED {Set a proper JWT_SECRET in your .env file that is at least 64 characters long}\n\
+    }\n\nconst generateToken = (user) => {\n  return jwt.sign({ userId: user._id }, JWT_SECRET);\n};\n\nconst verifyToken\
+    \ = (token) => {\n  try {\n    return jwt.verify(token, JWT_SECRET);\n  } catch (e) {\n    return null;\n  }\n};\n\nmodule.exports\
+    \ = {\n  generateToken,\n  verifyToken\n};\n\n```\n\n\nHere is a description of changes for a task you're currently working\
+    \ on:\n```\nThoughts: The 'npm start' command failed because there is no 'start' script defined in package.json.\n\nReasoning:\
+    \ To run the Node.js application with 'npm start', the package.json file must have a 'start' script specified in the 'scripts'\
+    \ section. We will add this script pointing to 'node index.js' to run the server.\n```\n\nThis task is broken down into\
+    \ steps. Please tell me the changes needed to implement the step #0 that is described like this:\n```\nIn the package.json\
+    \ file, under the 'scripts' object, add a new key-value pair: 'start': 'node index.js'. This will define the 'start' script\
+    \ to run the application.\n```\n\nWithin the file modifications, anything needs to be written by the user, add the comment\
+    \ in the same line as the code that starts with `// INPUT_REQUIRED {input_description}` where `input_description` is a\
+    \ description of what needs to be added here by the user. Just make sure that you put comments only inside files that\
+    \ support comments (e.g. not in JSON files)..\n\n**IMPORTANT**\nWhen you think about in which file should the new code\
+    \ go to, always try to make files as small as possible and put code in more smaller files rather than in one big file.\
+    \ Whenever a file becomes too large (more than 50 lines of code) split it into smaller files.\n\n**IMPORTANT**\nWhen you\
+    \ want to add a comment that tells the user to add the previous implementation at that place, make sure that the comment\
+    \ starts with `[OLD CODE]` and add a description of what old code should be inserted here. For example, `[OLD CODE] Login\
+    \ route`.\n\n"
+- role: user
+  content: "**IMPORTANT**\nYou must respond with ONLY the JSON object, with NO additional text or explanation.\n\nHere is\
+    \ the schema for the expected JSON object:\n```json\n{\n    \"files\": {\n        \"type\": \"array\",\n        \"description\"\
+    : \"List of files that need to be saved.\",\n        \"items\": {\n            \"type\": \"object\",\n            \"properties\"\
+    : {\n                \"name\": {\n                    \"type\": \"string\",\n                    \"description\": \"Name\
+    \ of the file that needs to be saved on the disk.\"\n                },\n                \"path\": {\n               \
+    \     \"type\": \"string\",\n                    \"description\": \"Full path of the file with the file name that needs\
+    \ to be saved.\"\n                },\n                \"content\": {\n                    \"type\": \"string\",\n    \
+    \                \"description\": \"Full content of the file that needs to be saved on the disk. **IMPORTANT**When you\
+    \ want to add a comment that tells the user to add the previous implementation at that place, make sure that the comment\
+    \ starts with `[OLD CODE]` and add a description of what old code should be inserted here. For example, `[OLD CODE] Login\
+    \ route`.\"\n                },\n                \"description\": {\n                    \"type\": \"string\",\n     \
+    \               \"description\": \"Description of the file that needs to be saved on the disk. This description doesn't\
+    \ need to explain what is being done currently in this task but rather what is the idea behind this file - what do we\
+    \ want to put in this file in the future. Write the description ONLY if this is the first time this file is being saved.\
+    \ If this file already exists on the disk, leave this field empty.\"\n                }\n            },\n            \"\
+    required\": [\n                \"name\",\n                \"path\",\n                \"content\"\n            ]\n    \
+    \    }\n    }\n}\n```\n\n"
+response: "```json\n{\n    \"files\": [\n        {\n            \"name\": \"package.json\",\n            \"path\": \"/package.json\"\
+  ,\n            \"content\": \"{\\n  \\\"name\\\": \\\"ai_and_ml_\\\",\\n  \\\"version\\\": \\\"1.0.0\\\",\\n  \\\"description\\\
+  \": \\\"\\\",\\n  \\\"main\\\": \\\"index.js\\\",\\n  \\\"scripts\\\": {\\n    \\\"test\\\": \\\"echo \\\\\\\"Error: no\
+  \ test specified\\\\\\\" && exit 1\\\",\\n    \\\"start\\\": \\\"node index.js\\\"\\n  },\\n  \\\"keywords\\\": [],\\n \
+  \ \\\"author\\\": \\\"\\\",\\n  \\\"license\\\": \\\"ISC\\\",\\n  \\\"dependencies\\\": {\\n    \\\"bcrypt\\\": \\\"^5.1.1\\\
+  \",\\n    \\\"bcryptjs\\\": \\\"^2.4.3\\\",\\n    \\\"dotenv\\\": \\\"^16.3.1\\\",\\n    \\\"express\\\": \\\"^4.18.2\\\"\
+  ,\\n    \\\"jsonwebtoken\\\": \\\"^9.0.2\\\",\\n    \\\"mongoose\\\": \\\"^8.1.0\\\"\\n  }\\n}\\n\"\n        }\n    ]\n\
+  }\n```"

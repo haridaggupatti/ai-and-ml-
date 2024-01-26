@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Graf Visualization</title>
+</head>
+<body>
+    <button id="start-demo-button">Start Demo Trading</button>
+    <div id="graf-container"></div>
+    <script src="/scripts/graf.js"></script>
+    <script>
+      document.getElementById('start-demo-button').addEventListener('click', async () => {
+          const response = await fetch('/api/trading/start-demo-trading', { method: 'POST' });
+          const data = await response.json();
+          console.log(data); // Or update UI with a message
+      });
+    </script>
+</body>
+</html>
